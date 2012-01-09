@@ -20,7 +20,7 @@
                    "Etznab (Knife)",
                    "KauaK (Rain)",
                    "Ahau (Flower)" ])
-(defonce tzolkin-c (cycle tzolkin))
+(defonce tzolkin-c (drop 4 (cycle tzolkin)))
 
 
 (defonce haab [ "Pop (Mat)",
@@ -44,14 +44,14 @@
                 "Uayeb (Poisonous)" ])
 
 (defonce haab-seq
-  (concat (flatten (map #(repeat 20 %) (butlast haab)))
-          (repeat 5 (last haab))))
-(defonce haab-c (cycle haab-seq))
+  (concat
+    (for [ h (butlast haab) veintena (range 20) ] [h veintena])
+    (for [ veintena (range 5) ] [(last haab) veintena])))
+
+(defonce haab-c (drop (+ 13 (* 13 20)) (cycle haab-seq)))
 
 
 (defonce trecena (range 1 14))
-(defonce trecena-c (cycle trecena))
+(defonce trecena-c (drop 12 (cycle trecena)))
 
-
-(defonce veintena (range 20))
-(defonce veintena-c (cycle (range 20)))
+(defonce calround-c (map (fn [& args] args) haab-c trecena-c tzolkin-c))
