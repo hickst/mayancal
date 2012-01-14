@@ -1,5 +1,15 @@
 (ns mayancal.core)
 
+;; infinite sequence of Gregorian Dates starting on Jan 1 2012
+(defonce gregorian-date-seq
+  (let [ start-date (java.util.GregorianCalendar. 2012 0 0 0 0) ]
+    (repeatedly
+      (fn []
+        (.add start-date java.util.Calendar/DAY_OF_YEAR 1)
+        (.getTime start-date)))))
+
+
+;; basic cycle of the Mayan calendar: 20 named days combine with Trecena to form 260 unique days.
 (defonce tzolkin [ "Imix (Alligator)",
                    "Ik (Wind)",
                    "Akbal (House)",
@@ -20,9 +30,19 @@
                    "Etznab (Knife)",
                    "KauaK (Rain)",
                    "Ahau (Flower)" ])
-(defonce tzolkin-c (drop 4 (cycle tzolkin)))
+
+;; infinite cycle of 20 named days, aligned to our arbitrary start date of 1/1/2012.
+(defonce tzolkin-cyc (drop 4 (cycle tzolkin)))
 
 
+;; repeating 13 day-number cycle: combined with Tzolkin to form 260 unique days.
+(defonce trecena (range 1 14))
+
+;; infinite sequence of 13 day-numbers, aligned to our arbitrary start date of 1/1/2012.
+(defonce trecena-cyc (drop 12 (cycle trecena)))
+
+
+;; basic cycle of Mayan solar calendar: 18 named months of 20 days each + 1 month of 5 days.
 (defonce haab [ "Pop (Mat)",
                 "Uo (Night Jaguar)",
                 "Zip (Cloud Serpent)",
@@ -43,15 +63,16 @@
                 "Kumh'u (Underworld Dragon)",
                 "Uayeb (Poisonous)" ])
 
+;; solar calendar of 365 days: Haab months crossed with Veintena cycle.
 (defonce haab-seq
   (concat
     (for [ h (butlast haab) veintena (range 20) ] [h veintena])
     (for [ veintena (range 5) ] [(last haab) veintena])))
 
-(defonce haab-c (drop (+ 13 (* 13 20)) (cycle haab-seq)))
+;; infinite sequence of Haab month/day pairs.
+(defonce haab-cyc (drop (+ 13 (* 13 20)) (cycle haab-seq)))
 
 
-(defonce trecena (range 1 14))
-(defonce trecena-c (drop 12 (cycle trecena)))
-
-(defonce calround-c (map (fn [& args] args) haab-c trecena-c tzolkin-c))
+;; aligned sequences of Gregorian, Haab, Trecena, and Tzolkin cycles
+(defonce calround-seq
+  (map (fn [& args] args) gregorian-date-seq haab-cyc trecena-cyc tzolkin-cyc))
