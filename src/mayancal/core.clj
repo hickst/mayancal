@@ -2,11 +2,12 @@
 
 ;; infinite sequence of Gregorian Dates starting on Jan 1 2012
 (defonce gregorian-date-seq
-  (let [ start-date (java.util.GregorianCalendar. 2012 0 0 0 0) ]
+  (let [ start-date (java.util.GregorianCalendar. 2012 0 0 0 0)
+         gd-format (java.text.SimpleDateFormat. "EEE M/d/yyyy") ]
     (repeatedly
       (fn []
         (.add start-date java.util.Calendar/DAY_OF_YEAR 1)
-        (.getTime start-date)))))
+        (.format gd-format (.getTime start-date))))))
 
 
 ;; basic cycle of the Mayan calendar: 20 named days combine with Trecena to form 260 unique days.
@@ -66,8 +67,8 @@
 ;; solar calendar of 365 days: Haab months crossed with Veintena cycle.
 (defonce haab-seq
   (concat
-    (for [ h (butlast haab) veintena (range 20) ] [h veintena])
-    (for [ veintena (range 5) ] [(last haab) veintena])))
+    (for [ h (butlast haab) veintena (range 20) ] (seq [h veintena]))
+    (for [ veintena (range 5) ] (seq [(last haab) veintena]))))
 
 ;; infinite sequence of Haab month/day pairs.
 (defonce haab-cyc (drop (+ 13 (* 13 20)) (cycle haab-seq)))
@@ -75,4 +76,7 @@
 
 ;; aligned sequences of Gregorian, Haab, Trecena, and Tzolkin cycles
 (defonce calround-seq
-  (map (fn [& args] args) gregorian-date-seq haab-cyc trecena-cyc tzolkin-cyc))
+  (map (fn [& args] args)
+       gregorian-date-seq
+       haab-cyc
+       (map (fn [& args] args) trecena-cyc tzolkin-cyc)))
