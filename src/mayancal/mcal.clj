@@ -1,4 +1,4 @@
-(ns mayancal.core)
+(ns mayancal.mcal)
 
 ;; infinite sequence of Gregorian Dates starting on Jan 1 2012
 (defonce gregorian-date-seq
