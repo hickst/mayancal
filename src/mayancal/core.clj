@@ -1,5 +1,4 @@
 (ns mayancal.core
-  (:require [clojure.java.io :as io])
   (:require [clojure.tools.cli :as cli])
   (:require [mayancal.mcal :as mcal])
   (:require [mayancal.genpdf :as pdf])
@@ -28,7 +27,7 @@
         (System/exit 2)))
 
     ;; generate a round calendar the desired year and pass it to the PDF formatter
-    (let [ year (if (nil? (first other-args)) "2012" (first other-args))
+    (let [ year (or (first other-args) "2012")
            roundcal (mcal/roundcal-for-year year) ]
         (pdf/gen-cal roundcal (:o options)))
 ))

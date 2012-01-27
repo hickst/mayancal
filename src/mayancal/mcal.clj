@@ -80,3 +80,7 @@
        gregorian-date-seq
        haab-cyc
        (map (fn [& args] args) trecena-cyc tzolkin-cyc)))
+
+(defn roundcal-for-year [year]
+  ;; TODO: really implement this LATER
+  (take 366 calround-seq))
