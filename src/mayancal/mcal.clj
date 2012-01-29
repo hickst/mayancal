@@ -83,4 +83,4 @@
 
 (defn roundcal-for-year [year]
   ;; TODO: really implement this LATER
-  (take 366 calround-seq))
+  (partition-by (fn [val] (first (second val))) (take 366 calround-seq)))
