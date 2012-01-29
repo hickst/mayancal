@@ -81,6 +81,13 @@
        haab-cyc
        (map (fn [& args] args) trecena-cyc tzolkin-cyc)))
 
-(defn roundcal-for-year [year]
+(defn roundcal-year [year]
   ;; TODO: really implement this LATER
   (partition-by (fn [val] (first (second val))) (take 366 calround-seq)))
+
+;; accessor functions for the roundcal months (produced by the roundcal-year function)
+(defn gregorian [roundcal-month] (first roundcal-month))
+(defn haab-name [roundcal-month] (first (second roundcal-month)))
+(defn haab-number [roundcal-month] (second (second roundcal-month)))
+(defn tzolkin-number [roundcal-month] (first (nth roundcal-month 2)))
+(defn tzolkin-name [roundcal-month] (second (nth roundcal-month 2)))

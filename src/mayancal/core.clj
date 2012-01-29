@@ -28,7 +28,7 @@
 
     ;; generate a round calendar the desired year and pass it to the PDF formatter
     (let [ year (or (first other-args) "2012")
-           roundcal (mcal/roundcal-for-year year) ]
+           roundcal (mcal/roundcal-year year) ]
         (pdf/gen-cal roundcal (:o options)))
 ))
 
