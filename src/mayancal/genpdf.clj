@@ -12,7 +12,7 @@
 (defonce doc-margin-right (.floatValue 72.0))
 (defonce doc-margin-top (.floatValue 108.0))
 (defonce doc-margin-bottom (.floatValue 72.0))
-(defonce month-cell-margin-right (.floatValue 10.0))
+(defonce month-cell-margin-right (.floatValue 48.0))
 (defonce number-of-columns 5)
 (defonce table-width (.floatValue 700.0))
 (defonce write-row-x-offset (.floatValue 45.0))
@@ -68,29 +68,36 @@
 
 
 (defn- make-month-cell [month-name]
+  "Create and return the month title/image cell for the named month"
   (println "MONTH_NAME: " month-name)       ; REMOVE LATER
   (let [ para (doto (Paragraph. month-name month-font)
-                (.setAlignment (bit-or Image/RIGHT Image/TEXTWRAP))
-                (.setIndentationRight month-cell-margin-right))
-         glyph-filename (get mcal/haab-glyph-filenames month-name) ]
+                (.setAlignment Element/ALIGN_RIGHT)
+                (.setIndentationRight month-cell-margin-right) )
+         glyph-filename (get mcal/haab-glyph-filenames month-name)
+         month-cell (PdfPCell.) ]
+
+    (doto month-cell
+      (.setColspan number-of-columns)
+      (.setBackgroundColor header-color)
+      (.setHorizontalAlignment Element/ALIGN_MIDDLE)
+      (.setVerticalAlignment Element/ALIGN_RIGHT)
+      (.setPaddingBottom 15)
+      (.setPaddingTop 15)
+      (.setUseDescender true) )
 
     (when glyph-filename
       (when-let [glyph-img (Image/getInstance (str "resources/MonthIcons/" glyph-filename))]
         (.scalePercent glyph-img 50.0)
-        (.add para (Chunk. glyph-img 20 0 true)) ))
+        (.setAlignment glyph-img Image/TEXTWRAP)
+        (.add para (Chunk. glyph-img 20 -15 true)) ))
 
-    (doto (PdfPCell.)
-      (.setColspan number-of-columns)
-      (.setBackgroundColor header-color)
-      (.setHorizontalAlignment Element/ALIGN_TOP)
-      (.setVerticalAlignment Element/ALIGN_RIGHT)
-      (.setUseDescender true)
-      (.addElement para)
-      (.addElement Chunk/NEWLINE) )
+    (doto month-cell
+      (.addElement para) )                  ; returns the month-cell
 ))
 
 
 (defn- make-blank-cell [day-index]
+  "Create and return a new blank cell for the given numbered day"
   (let [ para (doto (Paragraph.)
                 (.setAlignment Element/ALIGN_RIGHT)
                 (.setIndentationRight day-cell-margin-right)
