@@ -10,11 +10,11 @@
 (defonce day-cell-margin-right (.floatValue 5.0))
 (defonce doc-margin-left (.floatValue 72.0))
 (defonce doc-margin-right (.floatValue 72.0))
-(defonce doc-margin-top (.floatValue 108.0))
-(defonce doc-margin-bottom (.floatValue 72.0))
+(defonce doc-margin-top (.floatValue 36.0))
+(defonce doc-margin-bottom (.floatValue 36.0))
 (defonce month-cell-margin-right (.floatValue 48.0))
 (defonce number-of-columns 5)
-(defonce table-width (.floatValue 700.0))
+(defonce table-width (.floatValue 684.0))
 (defonce write-row-x-offset (.floatValue 45.0))
 (defonce write-row-y-offset (.floatValue 50.0))
 
@@ -71,21 +71,21 @@
   ; TODO - IMPLEMENT LATER
 )
 
-(defn- gen-month-image [document canvas month-name]
+(defn- gen-month-image [document pdf-writer month-name]
   (let [ page-height (.getHeight PageSize/LETTER)
          page-width (.getWidth PageSize/LETTER)
          img-filename (get mcal/haab-image-filenames month-name)
-         img (Image/getInstance (str "resources/MonthPics/" img-filename)) ]
+         img (Image/getInstance (str "resources/MonthPics/" img-filename))
+         canvas (.getDirectContent pdf-writer) ]
     (.scaleToFit img page-height page-width)
     (.setAbsolutePosition img 0 0)
     (.addImage canvas img)
-    (.newPage document)
-))
+    (.newPage document) ))
 
 
 (defn- make-month-cell [month-name]
   "Create and return the month title/image cell for the named month"
-  (println "MONTH_NAME: " month-name)       ; REMOVE LATER
+  (println "Generating: " month-name)
   (let [ para (doto (Paragraph. month-name month-font)
                 (.setAlignment Element/ALIGN_RIGHT)
                 (.setIndentationRight month-cell-margin-right) )
@@ -108,7 +108,7 @@
         (.add para (Chunk. glyph-img 20 -15 true)) ))
 
     (doto month-cell
-      (.addElement para) )                  ; returns the month-cell
+      (.addElement para))                   ; returns the month-cell
 ))
 
 
@@ -153,14 +153,15 @@
   (doseq [month roundcal]
     (let [ first-day (first month)
            month-name (mcal/haab-name first-day)
-           skip-blanks (or (.startsWith month-name "Uayeb") (= month (last roundcal)))
-           canvas (.getDirectContent pdf-writer) ]
+           skip-blanks (or (.startsWith month-name "Uayeb") (= month (last roundcal))) ]
       (gen-background-image pdf-writer)
-      (gen-month-image document canvas month-name)
+      (gen-month-image document pdf-writer month-name)
       (gen-background-image pdf-writer)
-      (let [table (PdfPTable. number-of-columns)]
-        (.setHorizontalAlignment table Element/ALIGN_TOP)
-        (.setTotalWidth table table-width)
+      (let [table (doto (PdfPTable. number-of-columns)
+                    (.setHorizontalAlignment Element/ALIGN_TOP)
+                    (.setKeepTogether true)
+                    (.setTotalWidth table-width)
+                    (.setLockedWidth true)) ]
         (.setBackgroundColor (.getDefaultCell table) cell-color)
         (.addCell table (make-month-cell month-name))
         (when-not skip-blanks
@@ -169,9 +170,7 @@
         (doseq [day month]
           (.addCell table (make-day-cell day)))
         (.completeRow table)
-        (.writeSelectedRows table 0 -1 write-row-x-offset
-                            (.floatValue (+ write-row-y-offset (.getTotalHeight table)))
-                            canvas)
+        (.add document table)
       )
       (.newPage document) )))
 
@@ -189,12 +188,10 @@
     (.setMargins document doc-margin-left doc-margin-right doc-margin-top doc-margin-bottom)
     (.setMarginMirroringTopBottom document true)      ; for top binding
     (.open document)
-    (let [canvas (.getDirectContent pdf-writer)]
-      (add-metadata document)
-      (gen-cover document pdf-writer)
-      (gen-preface document pdf-writer)
-      (gen-months document pdf-writer roundcal)
-      (gen-postface document pdf-writer)
-    )
+    (add-metadata document)
+    (gen-cover document pdf-writer)
+    (gen-preface document pdf-writer)
+    (gen-months document pdf-writer roundcal)
+    (gen-postface document pdf-writer)
     (.close document)
 ))
