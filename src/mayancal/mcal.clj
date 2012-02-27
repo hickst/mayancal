@@ -87,6 +87,29 @@
             "kumhu_glyph.png"
             "uayeb_glyph.png" ]))
 
+;; map the Haab month strings to filenames containing their month images
+(defonce haab-image-filenames
+  (zipmap haab
+          [ "pop.png"
+            "uo.png"
+            "zip.png"
+            "zotz.png"
+            "tsek.png"
+            "xul.png"
+            "yaxkin.png"
+            "mol.png"
+            "chen.png"
+            "yax.png"
+            "zak.png"
+            "keh.gif"
+            "mak.png"
+            "kankin.png"
+            "muan.png"
+            "pax.png"
+            "kayab.png"
+            "kumhu.gif"
+            "uayeb.png" ]))
+
 
 ;; solar calendar of 365 days: Haab months crossed with Veintena cycle.
 (defonce haab-seq

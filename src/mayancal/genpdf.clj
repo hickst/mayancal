@@ -39,32 +39,48 @@
     (.addCreator "Tom Hicks") ))
 
 
-(defn- gen-background-image [canvas]
+(defn- gen-background-image [pdf-writer]
   (let [ page-height (.getHeight PageSize/LETTER)
          page-width (.getWidth PageSize/LETTER)
+         under (.getDirectContentUnder pdf-writer)
          img (Image/getInstance "resources/codexpaper.jpg") ]
-    (.scaleToFit img page-height page-width)
-    (.setAlignment img Element/ALIGN_CENTER)
-    (.setAbsolutePosition img 0 0)
-    (.addImage canvas img) ))
+    (doto img
+      (.scaleToFit page-height page-width)
+      (.setAlignment Element/ALIGN_CENTER)
+      (.setAbsolutePosition 0 0) )
+    (.saveState under)
+    (.addImage under img)
+    (.restoreState under) ))
 
 
-(defn- gen-preface [document canvas]
-  (gen-background-image canvas)
-  (.add document (Paragraph. "Hello 2012!"))
-  (.newPage document) )
-
-
-(defn- gen-month-image [canvas month-name]
+(defn- gen-cover [document pdf-writer]
+  (gen-background-image pdf-writer)
   (let [ page-height (.getHeight PageSize/LETTER)
          page-width (.getWidth PageSize/LETTER)
-         ;; img (Image/getInstance (month-to-image-map month-name))
-         img (Image/getInstance "resources/MonthIcons/kankin_glyph.png") ]
+         img (Image/getInstance "resources/MonthPics/cover.png")
+         canvas (.getDirectContent pdf-writer) ]
     (.scaleToFit img page-height page-width)
     (.setAbsolutePosition img 0 0)
     ;; (.setAbsolutePosition img (/ (- page-height (.getScaledHeight img)) 2)
     ;;                           (/ (- page-width (.getScaledWidth img)) 2) )
-    (.addImage canvas img) ))
+    (.addImage canvas img)
+    (.newPage document) ))
+
+
+(defn- gen-preface [document pdf-writer]
+  ; TODO - IMPLEMENT LATER
+)
+
+(defn- gen-month-image [document canvas month-name]
+  (let [ page-height (.getHeight PageSize/LETTER)
+         page-width (.getWidth PageSize/LETTER)
+         img-filename (get mcal/haab-image-filenames month-name)
+         img (Image/getInstance (str "resources/MonthPics/" img-filename)) ]
+    (.scaleToFit img page-height page-width)
+    (.setAbsolutePosition img 0 0)
+    (.addImage canvas img)
+    (.newPage document)
+))
 
 
 (defn- make-month-cell [month-name]
@@ -133,13 +149,15 @@
       (.addElement para) )))
 
 
-(defn- gen-months [document canvas roundcal]
+(defn- gen-months [document pdf-writer roundcal]
   (doseq [month roundcal]
     (let [ first-day (first month)
-          month-name (mcal/haab-name first-day)
-          skip-blanks (or (.startsWith month-name "Uayeb") (= month (last roundcal))) ]
-      (gen-background-image canvas)
-      ;; (gen-month-image canvas month-name)
+           month-name (mcal/haab-name first-day)
+           skip-blanks (or (.startsWith month-name "Uayeb") (= month (last roundcal)))
+           canvas (.getDirectContent pdf-writer) ]
+      (gen-background-image pdf-writer)
+      (gen-month-image document canvas month-name)
+      (gen-background-image pdf-writer)
       (let [table (PdfPTable. number-of-columns)]
         (.setHorizontalAlignment table Element/ALIGN_TOP)
         (.setTotalWidth table table-width)
@@ -158,8 +176,8 @@
       (.newPage document) )))
 
 
-(defn- gen-postface [document canvas]
-  (gen-background-image canvas)
+(defn- gen-postface [document pdf-writer]
+  (gen-background-image pdf-writer)
   (.add document (Paragraph. "Goodbye 2012!")) )
 
 
@@ -173,9 +191,10 @@
     (.open document)
     (let [canvas (.getDirectContent pdf-writer)]
       (add-metadata document)
-      (gen-preface document canvas)
-      (gen-months document canvas roundcal)
-      (gen-postface document canvas)
+      (gen-cover document pdf-writer)
+      (gen-preface document pdf-writer)
+      (gen-months document pdf-writer roundcal)
+      (gen-postface document pdf-writer)
     )
     (.close document)
 ))
