@@ -16,7 +16,7 @@
 (defonce number-of-columns 5)
 (defonce table-width (.floatValue 700.0))
 (defonce write-row-x-offset (.floatValue 45.0))
-(defonce write-row-y-offset (.floatValue 100.0))
+(defonce write-row-y-offset (.floatValue 50.0))
 
 ;; color definitions:
 (defonce blank-cell-color (BaseColor. 0xE0 0xE0 0xE0))
@@ -70,8 +70,15 @@
 (defn- make-month-cell [month-name]
   (println "MONTH_NAME: " month-name)       ; REMOVE LATER
   (let [ para (doto (Paragraph. month-name month-font)
-                (.setAlignment Element/ALIGN_RIGHT)
-                (.setIndentationRight month-cell-margin-right)) ]
+                (.setAlignment (bit-or Image/RIGHT Image/TEXTWRAP))
+                (.setIndentationRight month-cell-margin-right))
+         glyph-filename (get mcal/haab-glyph-filenames month-name) ]
+
+    (when glyph-filename
+      (when-let [glyph-img (Image/getInstance (str "resources/MonthIcons/" glyph-filename))]
+        (.scalePercent glyph-img 50.0)
+        (.add para (Chunk. glyph-img 20 0 true)) ))
+
     (doto (PdfPCell.)
       (.setColspan number-of-columns)
       (.setBackgroundColor header-color)
@@ -79,7 +86,8 @@
       (.setVerticalAlignment Element/ALIGN_RIGHT)
       (.setUseDescender true)
       (.addElement para)
-      (.addElement Chunk/NEWLINE) )))
+      (.addElement Chunk/NEWLINE) )
+))
 
 
 (defn- make-blank-cell [day-index]
@@ -121,7 +129,8 @@
 (defn- gen-months [document canvas roundcal]
   (doseq [month roundcal]
     (let [ first-day (first month)
-          month-name (mcal/haab-name first-day) ]
+          month-name (mcal/haab-name first-day)
+          skip-blanks (or (.startsWith month-name "Uayeb") (= month (last roundcal))) ]
       (gen-background-image canvas)
       ;; (gen-month-image canvas month-name)
       (let [table (PdfPTable. number-of-columns)]
@@ -129,8 +138,9 @@
         (.setTotalWidth table table-width)
         (.setBackgroundColor (.getDefaultCell table) cell-color)
         (.addCell table (make-month-cell month-name))
-        (dotimes [day-index (- 20 (count month))]
-          (.addCell table (make-blank-cell day-index)))
+        (when-not skip-blanks
+          (dotimes [day-index (- 20 (count month))]
+            (.addCell table (make-blank-cell day-index))))
         (doseq [day month]
           (.addCell table (make-day-cell day)))
         (.completeRow table)

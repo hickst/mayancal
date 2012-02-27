@@ -9,7 +9,7 @@
   (let [ usage "Usage: java -jar mayancal.jar -o out-pdf-file [year]"
          [options other-args flag-usage]
            (cli/cli args
-             ["-o" "The basename (without extension) for the output PDF file"]) ]
+             ["-bn" "The basename (without extension) for the output PDF file"]) ]
 
     ;; if user asks for help, print usage messages and exit
     (if (:h options)
@@ -19,7 +19,7 @@
         (System/exit 1)))
 
     ;; check for any missing arguments
-    (if (not (:o options))
+    (if (not (:bn options))
       (do
         (println "ERROR: Required output file basename argument is missing.")
         (println usage)
@@ -29,11 +29,11 @@
     ;; generate a round calendar the desired year and pass it to the PDF formatter
     (let [ year (or (first other-args) "2012")
            roundcal (mcal/roundcal-year year) ]
-        (pdf/gen-cal roundcal (:o options)))
+        (pdf/gen-cal roundcal (:bn options)))
 ))
 
 (comment
   (ns mayancal.core)
   (load "core")
-  (-main "-o" "out-file-basename")
+  (-main "-bn" "out-file-basename")
 )

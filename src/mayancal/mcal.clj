@@ -11,25 +11,25 @@
 
 
 ;; basic cycle of the Mayan calendar: 20 named days combine with Trecena to form 260 unique days.
-(defonce tzolkin [ "Imix (Alligator)",
-                   "Ik (Wind)",
-                   "Akbal (House)",
-                   "Kan (Lizard)",
-                   "Chikchan (Snake)",
-                   "Kimi (Death)",
-                   "Manik (Deer)",
-                   "Lamat (Rabbit)",
-                   "Muluk (Water)",
-                   "Ok (Dog)",
-                   "Chuen (Monkey)",
-                   "Eb (Grass)",
-                   "Ben (Reed)",
-                   "Ix (Jaguar)",
-                   "Men (Eagle)",
-                   "Kib (Vulture)",
-                   "Kaban (Earthquake)",
-                   "Etznab (Knife)",
-                   "KauaK (Rain)",
+(defonce tzolkin [ "Imix (Alligator)"
+                   "Ik (Wind)"
+                   "Akbal (House)"
+                   "Kan (Lizard)"
+                   "Chikchan (Snake)"
+                   "Kimi (Death)"
+                   "Manik (Deer)"
+                   "Lamat (Rabbit)"
+                   "Muluk (Water)"
+                   "Ok (Dog)"
+                   "Chuen (Monkey)"
+                   "Eb (Grass)"
+                   "Ben (Reed)"
+                   "Ix (Jaguar)"
+                   "Men (Eagle)"
+                   "Kib (Vulture)"
+                   "Kaban (Earthquake)"
+                   "Etznab (Knife)"
+                   "KauaK (Rain)"
                    "Ahau (Flower)" ])
 
 ;; infinite cycle of 20 named days, aligned to our arbitrary start date of 1/1/2012.
@@ -44,25 +44,49 @@
 
 
 ;; basic cycle of Mayan solar calendar: 18 named months of 20 days each + 1 month of 5 days.
-(defonce haab [ "Pop (Mat)",
-                "Uo (Night Jaguar)",
-                "Zip (Cloud Serpent)",
-                "Zotz' (Leaf Nosed Bat)",
-                "Tsek (Sky and Earth)",
-                "Xul (Dog)",
-                "Yaxk'in (New Sun)",
-                "Mol (Water)",
-                "Ch'en (Cave of the Moon)",
-                "Yax (Green, New)",
-                "Zak (White, Frog)",
-                "Keh (Red, Red Deer)",
-                "Mak (Enclosure)",
-                "K'ank'in (Underworld Dog)",
-                "Muan (Screech Owl)",
-                "Pax (Great Puma)",
-                "K'ayab (Turtle)",
-                "Kumh'u (Underworld Dragon)",
+(defonce haab [ "Pop (Mat)"
+                "Uo (Night Jaguar)"
+                "Zip (Cloud Serpent)"
+                "Zotz' (Leaf Nosed Bat)"
+                "Tsek (Sky and Earth)"
+                "Xul (Dog)"
+                "Yaxk'in (New Sun)"
+                "Mol (Water)"
+                "Ch'en (Cave of the Moon)"
+                "Yax (Green, New)"
+                "Zak (White, Frog)"
+                "Keh (Red, Red Deer)"
+                "Mak (Enclosure)"
+                "K'ank'in (Underworld Dog)"
+                "Muan (Screech Owl)"
+                "Pax (Great Puma)"
+                "K'ayab (Turtle)"
+                "Kumh'u (Underworld Dragon)"
                 "Uayeb (Poisonous)" ])
+
+;; map the Haab month strings to filenames containing their glyphs
+(defonce haab-glyph-filenames
+  (zipmap haab
+          [ "pop_glyph.png"
+            "uo_glyph.png"
+            "zip_glyph.png"
+            "zotz_glyph.png"
+            "tsek_glyph.png"
+            "xul_glyph.png"
+            "yaxkin_glyph.png"
+            "mol_glyph.png"
+            "chen_glyph.png"
+            "yax_glyph.png"
+            "zak_glyph.png"
+            "keh_glyph.png"
+            "mak_glyph.png"
+            "kankin_glyph.png"
+            "muan_glyph.png"
+            "pax_glyph.png"
+            "kayab_glyph.png"
+            "kumhu_glyph.png"
+            "uayeb_glyph.png" ]))
+
 
 ;; solar calendar of 365 days: Haab months crossed with Veintena cycle.
 (defonce haab-seq
