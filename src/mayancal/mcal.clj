@@ -1,8 +1,9 @@
-(ns mayancal.mcal)
+(ns mayancal.mcal
+  (:require [clojure.stacktrace :as st]))
 
-;; infinite sequence of Gregorian Dates starting on Jan 1 2012
-(defonce gregorian-date-seq
-  (let [ start-date (java.util.GregorianCalendar. 2012 0 0 0 0)
+(defn gregorian-date-seq [year]
+  "Return an infinite sequence of Gregorian date strings starting on January 1st of the given year"
+  (let [ start-date (java.util.GregorianCalendar. year 0 0 0 0)
          gd-format (java.text.SimpleDateFormat. "EEE M/d/yyyy") ]
     (repeatedly
       (fn []
@@ -11,8 +12,7 @@
 
 
 ;; basic cycle of the Mayan calendar: 20 named days combine with Trecena to form 260 unique days.
-(defonce tzolkin
-  [
+(defonce tzolkin [
    { :name "imix"     :title "Imix' (Alligator)"   :glyph "YYY" }
    { :name "ik"       :title "Ik' (Wind)"          :glyph "YYY" }
    { :name "akbal"    :title "Ak'b'al (House)"     :glyph "YYY" }
@@ -32,20 +32,7 @@
    { :name "kaban"    :title "Kab'an (Earthquake)" :glyph "YYY" }
    { :name "etznab"   :title "Etz'nab' (Knife)"    :glyph "YYY" }
    { :name "kawak"    :title "Kawak (Rain)"        :glyph "YYY" }
-   { :name "ajaw"     :title "Ajaw (Flower)"       :glyph "YYY" }
-  ]
-)
-
-;; given an annual cycle of days or day numbers, offset by the given number of days.
-(defn offset-into-cycle [units cycle] (drop units cycle))
-
-;; Tzolkin: infinite cycle of 20 named days.
-;; aligned to our arbitrary start date of 1/1/2012.
-(defonce tzolkin-cyc (offset-into-cycle 4 (cycle tzolkin)))
-
-;; Trecena: infinite cycle of 13 day-numbers: combined with Tzolkin to form 260 unique days.
-;; aligned to our arbitrary start date of 1/1/2012.
-(defonce trecena-cyc (offset-into-cycle 12 (cycle (range 1 14))))
+   { :name "ajaw"     :title "Ajaw (Flower)"       :glyph "YYY" } ])
 
 
 ;; basic cycle of Mayan solar calendar: 18 named months of 20 days each + 1 month of 5 days.
@@ -68,12 +55,7 @@
   { :name "pax"    :title "Pax (Great Puma)"           :glyph "pax_glyph.png"    :image "pax.png" }
   { :name "kayab"  :title "K'ayab (Turtle)"            :glyph "kayab_glyph.png"  :image "kayab.png" }
   { :name "kumku"  :title "Kumk'u (Underworld Dragon)" :glyph "kumhu_glyph.png"  :image "kumhu.gif" }
-  { :name "wayeb"  :title "Wayeb (Poisonous)"          :glyph "uayeb_glyph.png"  :image "uayeb.png" }
-  ]
-)
-
-(defn find-haab [name]
-  (keep-indexed #(if (= name (:name %2)) [%1 %2]) haab))
+  { :name "wayeb"  :title "Wayeb (Poisonous)"          :glyph "uayeb_glyph.png"  :image "uayeb.png" } ])
 
 
 ;; solar calendar of 365 days: Haab months crossed with Veintena cycle of 20 days.
@@ -86,27 +68,41 @@
   (concat (reduce concat [] (repeat 18 (range 20))) (range 5)))
 
 
-;; begin the given annual cycle of days, offset by the given number of months and days
+;; given the annual cycle of haab days, offset by the given number of months and days
 (defn offset-into-haab-cycle [months days cycle]
   (drop (+ days (* months 20)) cycle))
 
-
-;; infinite sequence of Haab month names
-(defonce haab-cyc (offset-into-haab-cycle 13 13 (cycle haab-seq)))
-
-;; infinite sequence of Haab day numbers
-(defonce haab-number-cyc (offset-into-haab-cycle 13 13 (cycle haab-number-seq)))
+;; given an annual cycle of days or day numbers, offset by the given number of days.
+(defn offset-into-cycle [units cycle] (drop units cycle))
 
 
-;; aligned sequences of Gregorian, Haab, Trecena, and Tzolkin cycles
-(defonce calround-cyc
+(defn find-days-in-year [year]
+  "Return the number of days in the given year"
+  (if (.isLeapYear (java.util.GregorianCalendar.) year) 366 365))
+
+
+;; create aligned sequences of Gregorian, Haab, Trecena, and Tzolkin cycles
+(defn make-calround-cycle [options]
+  "Return a lazy sequence of aligned sequences of Gregorian, Haab, Trecena, and Tzolkin cycles"
+  (let [ year (:year options)
+         hd-offset (:hd-offset options)
+         hm-offset (:hm-offset options)
+         haab-cyc (offset-into-haab-cycle hm-offset hd-offset (cycle haab-seq))
+         haab-number-cyc (offset-into-haab-cycle hm-offset hd-offset (cycle haab-number-seq))
+         tzolkin-cyc (offset-into-cycle (:tz-offset options) (cycle tzolkin))
+         trecena-cyc (offset-into-cycle (:tr-offset options) (cycle (range 1 14)))
+        ]
   (map (fn [& args] args)
-       gregorian-date-seq haab-cyc haab-number-cyc trecena-cyc tzolkin-cyc))
+       (gregorian-date-seq year) haab-cyc haab-number-cyc trecena-cyc tzolkin-cyc)
+))
 
 
-(defn roundcal-year [year]
-  ;; TODO: really implement this for each year LATER
-  (partition-by #(:haab %)
-                (map #(apply hash-map
-                             (interleave [:gregorian :haab :haab-number :trecena :tzolkin] %))
-                     (take 366 calround-cyc))))
+;; main method to create and return the round calendar
+(defn roundcal-year [options]
+  "Create and return a round calendar sequence for the specified year"
+  (let [ days-in-year (find-days-in-year (:year options)) ]
+    (partition-by #(:haab %)
+                  (map #(apply hash-map
+                               (interleave [:gregorian :haab :haab-number :trecena :tzolkin] %))
+                       (take days-in-year (make-calround-cycle options))))
+))
