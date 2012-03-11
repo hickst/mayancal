@@ -1,5 +1,4 @@
 (ns mayancal.genpdf
-;;  (:require [mayancal.mcal :as mcal])       ; REMOVE LATER
   (:import [com.itextpdf.text BaseColor Chunk Document DocumentException Element
                               Font Font$FontFamily Image PageSize Paragraph])
   (:import [com.itextpdf.text.pdf PdfContentByte PdfPCell PdfPTable PdfWriter]) )
@@ -39,6 +38,7 @@
 
 
 (defn- gen-background-image [pdf-writer]
+  "Generate the background image of textured paper onto the current page"
   (let [ page-height (.getHeight PageSize/LETTER)
          page-width (.getWidth PageSize/LETTER)
          under (.getDirectContentUnder pdf-writer)
@@ -53,6 +53,7 @@
 
 
 (defn- gen-cover [document pdf-writer]
+  "Generate the cover page"
   (gen-background-image pdf-writer)
   (let [ page-height (.getHeight PageSize/LETTER)
          page-width (.getWidth PageSize/LETTER)
@@ -67,13 +68,15 @@
 
 
 (defn- gen-preface [document pdf-writer]
+  "Generate the preface pages"
   ; TODO - IMPLEMENT LATER
 )
 
-(defn- gen-month-image [document pdf-writer month-name]
+(defn- gen-month-image [document pdf-writer day]
+  "Generate the picture page for the current month"
   (let [ page-height (.getHeight PageSize/LETTER)
          page-width (.getWidth PageSize/LETTER)
-         img-filename (:image month-name)
+         img-filename (:image (:haab day))
          img (Image/getInstance (str "resources/MonthPics/" img-filename))
          canvas (.getDirectContent pdf-writer) ]
     (.scaleToFit img page-height page-width)
@@ -82,13 +85,13 @@
     (.newPage document) ))
 
 
-(defn- make-month-cell [month-name]
-  "Create and return the month title/image cell for the named month"
-  (println "Generating: " month-name)
-  (let [ para (doto (Paragraph. month-name month-font)
+(defn- make-month-cell [day]
+  "Create and return the month title/image cell using month info from the given day"
+  (println "Generating: " (:title (:haab day)))
+  (let [ para (doto (Paragraph. (:title (:haab day)) month-font)
                 (.setAlignment Element/ALIGN_RIGHT)
                 (.setIndentationRight month-cell-margin-right) )
-         glyph-filename (:glyph month-name)
+         glyph-filename (:glyph (:haab day))
          month-cell (PdfPCell.) ]
 
     (doto month-cell
@@ -128,7 +131,7 @@
 
 
 (defn- make-day-cell [day]
-  (let [ tz-lbl (str (:trecena day) "-" (:tzolkin day) "  ")
+  (let [ tz-lbl (str (:trecena day) "-" (:title (:tzolkin day)) "  ")
          gregor-lbl (:gregorian day)
          day-index (:haab-number day)
          para (doto (Paragraph.)
@@ -149,12 +152,13 @@
 
 
 (defn- gen-months [document pdf-writer roundcal]
+  "Generate the pages for all the months"
   (doseq [month roundcal]
-    (let [ first-day (first month)
-           month-name (:haab first-day)
-           skip-blanks (or (.startsWith month-name "wayeb") (= month (last roundcal))) ]
+    (let [ day1 (first month)
+           month-name (:name (:haab day1))
+           skip-blanks (or (= month-name "wayeb") (= month (last roundcal))) ]
       (gen-background-image pdf-writer)
-      (gen-month-image document pdf-writer month-name)
+      (gen-month-image document pdf-writer day1)
       (gen-background-image pdf-writer)
       (let [table (doto (PdfPTable. number-of-columns)
                     (.setHorizontalAlignment Element/ALIGN_TOP)
@@ -162,7 +166,7 @@
                     (.setTotalWidth table-width)
                     (.setLockedWidth true)) ]
         (.setBackgroundColor (.getDefaultCell table) cell-color)
-        (.addCell table (make-month-cell month-name))
+        (.addCell table (make-month-cell day1))
         (when-not skip-blanks
           (dotimes [day-index (- 20 (count month))]
             (.addCell table (make-blank-cell day-index))))
