@@ -1,6 +1,5 @@
 (ns mayancal.genpdf
-  (:require [mayancal.mcal :as mcal
-             :only (gregorian haab-name haab-number tzolkin-number tzolkin-name)])
+;;  (:require [mayancal.mcal :as mcal])       ; REMOVE LATER
   (:import [com.itextpdf.text BaseColor Chunk Document DocumentException Element
                               Font Font$FontFamily Image PageSize Paragraph])
   (:import [com.itextpdf.text.pdf PdfContentByte PdfPCell PdfPTable PdfWriter]) )
@@ -74,7 +73,7 @@
 (defn- gen-month-image [document pdf-writer month-name]
   (let [ page-height (.getHeight PageSize/LETTER)
          page-width (.getWidth PageSize/LETTER)
-         img-filename (get mcal/haab-image-filenames month-name)
+         img-filename (:image month-name)
          img (Image/getInstance (str "resources/MonthPics/" img-filename))
          canvas (.getDirectContent pdf-writer) ]
     (.scaleToFit img page-height page-width)
@@ -89,7 +88,7 @@
   (let [ para (doto (Paragraph. month-name month-font)
                 (.setAlignment Element/ALIGN_RIGHT)
                 (.setIndentationRight month-cell-margin-right) )
-         glyph-filename (get mcal/haab-glyph-filenames month-name)
+         glyph-filename (:glyph month-name)
          month-cell (PdfPCell.) ]
 
     (doto month-cell
@@ -129,9 +128,9 @@
 
 
 (defn- make-day-cell [day]
-  (let [ tz-lbl (str (mcal/tzolkin-number day) "-" (mcal/tzolkin-name day) "  ")
-         gregor-lbl (mcal/gregorian day)
-         day-index (mcal/haab-number day)
+  (let [ tz-lbl (str (:trecena day) "-" (:tzolkin day) "  ")
+         gregor-lbl (:gregorian day)
+         day-index (:haab-number day)
          para (doto (Paragraph.)
                 (.setAlignment Element/ALIGN_RIGHT)
                 (.setIndentationRight day-cell-margin-right)
@@ -152,8 +151,8 @@
 (defn- gen-months [document pdf-writer roundcal]
   (doseq [month roundcal]
     (let [ first-day (first month)
-           month-name (mcal/haab-name first-day)
-           skip-blanks (or (.startsWith month-name "Uayeb") (= month (last roundcal))) ]
+           month-name (:haab first-day)
+           skip-blanks (or (.startsWith month-name "wayeb") (= month (last roundcal))) ]
       (gen-background-image pdf-writer)
       (gen-month-image document pdf-writer month-name)
       (gen-background-image pdf-writer)

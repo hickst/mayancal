@@ -11,130 +11,102 @@
 
 
 ;; basic cycle of the Mayan calendar: 20 named days combine with Trecena to form 260 unique days.
-(defonce tzolkin [ "Imix (Alligator)"
-                   "Ik (Wind)"
-                   "Akbal (House)"
-                   "Kan (Lizard)"
-                   "Chikchan (Snake)"
-                   "Kimi (Death)"
-                   "Manik (Deer)"
-                   "Lamat (Rabbit)"
-                   "Muluk (Water)"
-                   "Ok (Dog)"
-                   "Chuen (Monkey)"
-                   "Eb (Grass)"
-                   "Ben (Reed)"
-                   "Ix (Jaguar)"
-                   "Men (Eagle)"
-                   "Kib (Vulture)"
-                   "Kaban (Earthquake)"
-                   "Etznab (Knife)"
-                   "KauaK (Rain)"
-                   "Ahau (Flower)" ])
+(defonce tzolkin
+  [
+   { :name "imix"     :title "Imix' (Alligator)"   :glyph "YYY" }
+   { :name "ik"       :title "Ik' (Wind)"          :glyph "YYY" }
+   { :name "akbal"    :title "Ak'b'al (House)"     :glyph "YYY" }
+   { :name "kan"      :title "K'an (Lizard)"       :glyph "YYY" }
+   { :name "chikchan" :title "Chikchan (Snake)"    :glyph "YYY" }
+   { :name "kimi"     :title "Kimi (Death)"        :glyph "YYY" }
+   { :name "manik"    :title "Manik' (Deer)"       :glyph "YYY" }
+   { :name "lamat"    :title "Lamat (Rabbit)"      :glyph "YYY" }
+   { :name "muluk"    :title "Muluk (Water)"       :glyph "YYY" }
+   { :name "ok"       :title "Ok (Dog)"            :glyph "YYY" }
+   { :name "chuwen"   :title "Chuwen (Monkey)"     :glyph "YYY" }
+   { :name "eb"       :title "Eb' (Grass)"         :glyph "YYY" }
+   { :name "ben"      :title "B'en (Reed)"         :glyph "YYY" }
+   { :name "ix"       :title "Ix (Jaguar)"         :glyph "YYY" }
+   { :name "men"      :title "Men (Eagle)"         :glyph "YYY" }
+   { :name "kib"      :title "Kib' (Vulture)"      :glyph "YYY" }
+   { :name "kaban"    :title "Kab'an (Earthquake)" :glyph "YYY" }
+   { :name "etznab"   :title "Etz'nab' (Knife)"    :glyph "YYY" }
+   { :name "kawak"    :title "Kawak (Rain)"        :glyph "YYY" }
+   { :name "ajaw"     :title "Ajaw (Flower)"       :glyph "YYY" }
+  ]
+)
 
-;; infinite cycle of 20 named days, aligned to our arbitrary start date of 1/1/2012.
-(defonce tzolkin-cyc (drop 4 (cycle tzolkin)))
+;; given an annual cycle of days or day numbers, offset by the given number of days.
+(defn offset-into-cycle [units cycle] (drop units cycle))
 
+;; Tzolkin: infinite cycle of 20 named days.
+;; aligned to our arbitrary start date of 1/1/2012.
+(defonce tzolkin-cyc (offset-into-cycle 4 (cycle tzolkin)))
 
-;; repeating 13 day-number cycle: combined with Tzolkin to form 260 unique days.
-(defonce trecena (range 1 14))
-
-;; infinite sequence of 13 day-numbers, aligned to our arbitrary start date of 1/1/2012.
-(defonce trecena-cyc (drop 12 (cycle trecena)))
+;; Trecena: infinite cycle of 13 day-numbers: combined with Tzolkin to form 260 unique days.
+;; aligned to our arbitrary start date of 1/1/2012.
+(defonce trecena-cyc (offset-into-cycle 12 (cycle (range 1 14))))
 
 
 ;; basic cycle of Mayan solar calendar: 18 named months of 20 days each + 1 month of 5 days.
-(defonce haab [ "Pop (Mat)"
-                "Uo (Night Jaguar)"
-                "Zip (Cloud Serpent)"
-                "Zotz' (Leaf Nosed Bat)"
-                "Tsek (Sky and Earth)"
-                "Xul (Dog)"
-                "Yaxk'in (New Sun)"
-                "Mol (Water)"
-                "Ch'en (Cave of the Moon)"
-                "Yax (Green, New)"
-                "Zak (White, Frog)"
-                "Keh (Red, Red Deer)"
-                "Mak (Enclosure)"
-                "K'ank'in (Underworld Dog)"
-                "Muan (Screech Owl)"
-                "Pax (Great Puma)"
-                "K'ayab (Turtle)"
-                "Kumh'u (Underworld Dragon)"
-                "Uayeb (Poisonous)" ])
+(defonce haab [
+  { :name "pop"    :title "Pop (Mat)"                  :glyph "pop_glyph.png"    :image "pop.png" }
+  { :name "wo"     :title "Wo (Night Jaguar)"          :glyph "uo_glyph.png"     :image "uo.png" }
+  { :name "sip"    :title "Sip (Cloud Serpent)"        :glyph "zip_glyph.png"    :image "zip.png" }
+  { :name "sotz"   :title "Sotz' (Leaf Nosed Bat)"     :glyph "zotz_glyph.png"   :image "zotz.png" }
+  { :name "sek"    :title "Sek (Sky and Earth)"        :glyph "tsek_glyph.png"   :image "tsek.png" }
+  { :name "xul"    :title "Xul (Dog)"                  :glyph "xul_glyph.png"    :image "xul.png" }
+  { :name "yaxkin" :title "Yaxk'in (New Sun)"          :glyph "yaxkin_glyph.png" :image "yaxkin.png" }
+  { :name "mol"    :title "Mol (Water)"                :glyph "mol_glyph.png"    :image "mol.png" }
+  { :name "chen"   :title "Ch'en (Cave of the Moon)"   :glyph "chen_glyph.png"   :image "chen.png" }
+  { :name "yax"    :title "Yax (Green, New)"           :glyph "yax_glyph.png"    :image "yax.png" }
+  { :name "sak"    :title "Sak (White, Frog)"          :glyph "zak_glyph.png"    :image "zak.png" }
+  { :name "keh"    :title "Keh (Red, Red Deer)"        :glyph "keh_glyph.png"    :image "keh.gif" }
+  { :name "mak"    :title "Mak (Enclosure)"            :glyph "mak_glyph.png"    :image "mak.png" }
+  { :name "kankin" :title "K'ank'in (Underworld Dog)"  :glyph "kankin_glyph.png" :image "kankin.png" }
+  { :name "muwan"  :title "Muwan (Screech Owl)"        :glyph "muan_glyph.png"   :image "muan.png" }
+  { :name "pax"    :title "Pax (Great Puma)"           :glyph "pax_glyph.png"    :image "pax.png" }
+  { :name "kayab"  :title "K'ayab (Turtle)"            :glyph "kayab_glyph.png"  :image "kayab.png" }
+  { :name "kumku"  :title "Kumk'u (Underworld Dragon)" :glyph "kumhu_glyph.png"  :image "kumhu.gif" }
+  { :name "wayeb"  :title "Wayeb (Poisonous)"          :glyph "uayeb_glyph.png"  :image "uayeb.png" }
+  ]
+)
 
-;; map the Haab month strings to filenames containing their glyphs
-(defonce haab-glyph-filenames
-  (zipmap haab
-          [ "pop_glyph.png"
-            "uo_glyph.png"
-            "zip_glyph.png"
-            "zotz_glyph.png"
-            "tsek_glyph.png"
-            "xul_glyph.png"
-            "yaxkin_glyph.png"
-            "mol_glyph.png"
-            "chen_glyph.png"
-            "yax_glyph.png"
-            "zak_glyph.png"
-            "keh_glyph.png"
-            "mak_glyph.png"
-            "kankin_glyph.png"
-            "muan_glyph.png"
-            "pax_glyph.png"
-            "kayab_glyph.png"
-            "kumhu_glyph.png"
-            "uayeb_glyph.png" ]))
-
-;; map the Haab month strings to filenames containing their month images
-(defonce haab-image-filenames
-  (zipmap haab
-          [ "pop.png"
-            "uo.png"
-            "zip.png"
-            "zotz.png"
-            "tsek.png"
-            "xul.png"
-            "yaxkin.png"
-            "mol.png"
-            "chen.png"
-            "yax.png"
-            "zak.png"
-            "keh.gif"
-            "mak.png"
-            "kankin.png"
-            "muan.png"
-            "pax.png"
-            "kayab.png"
-            "kumhu.gif"
-            "uayeb.png" ]))
+(defn find-haab [name]
+  (keep-indexed #(if (= name (:name %2)) [%1 %2]) haab))
 
 
-;; solar calendar of 365 days: Haab months crossed with Veintena cycle.
+;; solar calendar of 365 days: Haab months crossed with Veintena cycle of 20 days.
 (defonce haab-seq
   (concat
-    (for [ h (butlast haab) veintena (range 20) ] (seq [h veintena]))
-    (for [ veintena (range 5) ] (seq [(last haab) veintena]))))
+    (mapcat (partial repeat 20) (butlast haab))
+    (repeat 5 (last haab))))
 
-;; infinite sequence of Haab month/day pairs.
-(defonce haab-cyc (drop (+ 13 (* 13 20)) (cycle haab-seq)))
+(defonce haab-number-seq
+  (concat (reduce concat [] (repeat 18 (range 20))) (range 5)))
+
+
+;; begin the given annual cycle of days, offset by the given number of months and days
+(defn offset-into-haab-cycle [months days cycle]
+  (drop (+ days (* months 20)) cycle))
+
+
+;; infinite sequence of Haab month names
+(defonce haab-cyc (offset-into-haab-cycle 13 13 (cycle haab-seq)))
+
+;; infinite sequence of Haab day numbers
+(defonce haab-number-cyc (offset-into-haab-cycle 13 13 (cycle haab-number-seq)))
 
 
 ;; aligned sequences of Gregorian, Haab, Trecena, and Tzolkin cycles
-(defonce calround-seq
+(defonce calround-cyc
   (map (fn [& args] args)
-       gregorian-date-seq
-       haab-cyc
-       (map (fn [& args] args) trecena-cyc tzolkin-cyc)))
+       gregorian-date-seq haab-cyc haab-number-cyc trecena-cyc tzolkin-cyc))
+
 
 (defn roundcal-year [year]
-  ;; TODO: really implement this LATER
-  (partition-by (fn [val] (first (second val))) (take 366 calround-seq)))
-
-;; accessor functions for the roundcal months (produced by the roundcal-year function)
-(defn gregorian [roundcal-month] (first roundcal-month))
-(defn haab-name [roundcal-month] (first (second roundcal-month)))
-(defn haab-number [roundcal-month] (second (second roundcal-month)))
-(defn tzolkin-number [roundcal-month] (first (nth roundcal-month 2)))
-(defn tzolkin-name [roundcal-month] (second (nth roundcal-month 2)))
+  ;; TODO: really implement this for each year LATER
+  (partition-by #(:haab %)
+                (map #(apply hash-map
+                             (interleave [:gregorian :haab :haab-number :trecena :tzolkin] %))
+                     (take 366 calround-cyc))))
