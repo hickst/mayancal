@@ -13,26 +13,27 @@
 
 ;; basic cycle of the Mayan calendar: 20 named days combine with Trecena to form 260 unique days.
 (defonce tzolkin [
-   { :name "imix"     :title "Imix' (Alligator)"   :glyph "YYY" }
-   { :name "ik"       :title "Ik' (Wind)"          :glyph "YYY" }
-   { :name "akbal"    :title "Ak'b'al (House)"     :glyph "YYY" }
-   { :name "kan"      :title "K'an (Lizard)"       :glyph "YYY" }
-   { :name "chikchan" :title "Chikchan (Snake)"    :glyph "YYY" }
-   { :name "kimi"     :title "Kimi (Death)"        :glyph "YYY" }
-   { :name "manik"    :title "Manik' (Deer)"       :glyph "YYY" }
-   { :name "lamat"    :title "Lamat (Rabbit)"      :glyph "YYY" }
-   { :name "muluk"    :title "Muluk (Water)"       :glyph "YYY" }
-   { :name "ok"       :title "Ok (Dog)"            :glyph "YYY" }
-   { :name "chuwen"   :title "Chuwen (Monkey)"     :glyph "YYY" }
-   { :name "eb"       :title "Eb' (Grass)"         :glyph "YYY" }
-   { :name "ben"      :title "B'en (Reed)"         :glyph "YYY" }
-   { :name "ix"       :title "Ix (Jaguar)"         :glyph "YYY" }
-   { :name "men"      :title "Men (Eagle)"         :glyph "YYY" }
-   { :name "kib"      :title "Kib' (Vulture)"      :glyph "YYY" }
-   { :name "kaban"    :title "Kab'an (Earthquake)" :glyph "YYY" }
-   { :name "etznab"   :title "Etz'nab' (Knife)"    :glyph "YYY" }
-   { :name "kawak"    :title "Kawak (Rain)"        :glyph "YYY" }
-   { :name "ajaw"     :title "Ajaw (Flower)"       :glyph "YYY" } ])
+   { :name "imix"     :title "Imix' (Alligator)"   :glyph "imix.gif" }
+   { :name "ik"       :title "Ik' (Wind)"          :glyph "ik.gif" }
+   { :name "akbal"    :title "Ak'b'al (House)"     :glyph "akbal.gif" }
+   { :name "kan"      :title "K'an (Lizard)"       :glyph "kan.gif" }
+   { :name "chikchan" :title "Chikchan (Snake)"    :glyph "chikchan.gif" }
+   { :name "kimi"     :title "Kimi (Death)"        :glyph "kimi.gif" }
+   { :name "manik"    :title "Manik' (Deer)"       :glyph "manik.gif" }
+   { :name "lamat"    :title "Lamat (Rabbit)"      :glyph "lamat.gif" }
+   { :name "muluk"    :title "Muluk (Water)"       :glyph "muluk.gif" }
+   { :name "ok"       :title "Ok (Dog)"            :glyph "ok.gif" }
+   { :name "chuwen"   :title "Chuwen (Monkey)"     :glyph "chuwen.gif" }
+   { :name "eb"       :title "Eb' (Grass)"         :glyph "eb.gif" }
+   { :name "ben"      :title "B'en (Reed)"         :glyph "ben.gif" }
+   { :name "ix"       :title "Ix (Jaguar)"         :glyph "ix.gif" }
+   { :name "men"      :title "Men (Eagle)"         :glyph "men.gif" }
+   { :name "kib"      :title "Kib' (Vulture)"      :glyph "kib.gif" }
+   { :name "kaban"    :title "Kab'an (Earthquake)" :glyph "kaban.gif" }
+   { :name "etznab"   :title "Etz'nab' (Knife)"    :glyph "etznab.gif" }
+   { :name "kawak"    :title "Kawak (Rain)"        :glyph "kawak.gif" }
+   { :name "ajaw"     :title "Ajaw (Flower)"       :glyph "ajaw.gif" }
+  ])
 
 
 ;; basic cycle of Mayan solar calendar: 18 named months of 20 days each + 1 month of 5 days.
