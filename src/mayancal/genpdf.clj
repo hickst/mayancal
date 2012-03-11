@@ -1,4 +1,5 @@
 (ns mayancal.genpdf
+  (:require [mayancal.mcal :as mcal :only (haab tzolkin)])
   (:import [com.itextpdf.text BaseColor Chunk Document DocumentException Element
                               Font Font$FontFamily Image PageSize Paragraph])
   (:import [com.itextpdf.text.pdf PdfContentByte PdfPCell PdfPTable PdfWriter]) )
@@ -11,7 +12,8 @@
 (defonce doc-margin-top (.floatValue 36.0))
 (defonce doc-margin-bottom (.floatValue 36.0))
 (defonce month-cell-margin-right (.floatValue 48.0))
-(defonce number-of-columns 5)
+(defonce number-of-calendar-columns 5)
+(defonce number-of-preface-columns 5)
 (defonce table-width (.floatValue 684.0))
 (defonce write-row-x-offset (.floatValue 45.0))
 (defonce write-row-y-offset (.floatValue 50.0))
@@ -24,10 +26,11 @@
 (defonce tzday-color (BaseColor. 0x00 0x00 0x7F))
 
 ;; font definitions
+(defonce gregor-font (Font. Font$FontFamily/HELVETICA (.floatValue 10.0) Font/NORMAL gregor-color))
+(defonce label-font (Font. Font$FontFamily/HELVETICA (.floatValue 16.0) Font/BOLD))
 (defonce month-font (Font. Font$FontFamily/HELVETICA (.floatValue 18.0) Font/BOLD))
 (defonce tzday-font (Font. Font$FontFamily/HELVETICA (.floatValue 10.0) Font/NORMAL tzday-color))
 (defonce tzindex-font (Font. Font$FontFamily/HELVETICA (.floatValue 12.0) Font/BOLD))
-(defonce gregor-font (Font. Font$FontFamily/HELVETICA (.floatValue 10.0) Font/NORMAL gregor-color))
 
 
 (defn- add-metadata [document]
@@ -67,9 +70,50 @@
     (.newPage document) ))
 
 
+(declare make-blank-cell)                   ; REMOVE LATER forward declaration
+
+
+(defn make-label-cell [document pdf-writer label]
+  "Create and return the icon table title cell using the given label"
+  (let [ para (doto (Paragraph. label label-font)
+                (.setAlignment Element/ALIGN_CENTER)) ]
+    (doto (PdfPCell.)
+      (.setColspan number-of-preface-columns)
+      (.setBackgroundColor header-color)
+      (.setHorizontalAlignment Element/ALIGN_MIDDLE)
+      ; (.setVerticalAlignment Element/ALIGN_CENTER)
+      (.setPaddingBottom 15)
+      (.setPaddingTop 15)
+      (.setUseDescender true)
+      (.addElement para) )                  ; returns the label-cell
+))
+
+
+(defn gen-icon-table [document pdf-writer icon-data label]
+  "Generate a table of day or month icons"
+  (gen-background-image pdf-writer)
+  (let [table (doto (PdfPTable. number-of-preface-columns)
+                (.setHorizontalAlignment Element/ALIGN_TOP)
+                (.setKeepTogether true)
+                (.setTotalWidth table-width)
+                (.setLockedWidth true)) ]
+    (.setBackgroundColor (.getDefaultCell table) cell-color)
+    (.addCell table (make-label-cell document pdf-writer label))
+
+    (doseq [unit icon-data]
+;      (.addCell table (make-icon-cell unit)) )
+      (.addCell table (make-blank-cell 0)) )
+    (.completeRow table)
+    (.add document table)
+  )
+  (.newPage document)
+)
+
+
 (defn- gen-preface [document pdf-writer]
   "Generate the preface pages"
-  ; TODO - IMPLEMENT LATER
+  (gen-icon-table document pdf-writer mcal/haab "Haab: Month Names and Translations")
+  (gen-icon-table document pdf-writer mcal/tzolkin "Tzolk'in: Day Names and Translations")
 )
 
 (defn- gen-month-image [document pdf-writer day]
@@ -95,7 +139,7 @@
          month-cell (PdfPCell.) ]
 
     (doto month-cell
-      (.setColspan number-of-columns)
+      (.setColspan number-of-calendar-columns)
       (.setBackgroundColor header-color)
       (.setHorizontalAlignment Element/ALIGN_MIDDLE)
       (.setVerticalAlignment Element/ALIGN_RIGHT)
@@ -160,7 +204,7 @@
       (gen-background-image pdf-writer)
       (gen-month-image document pdf-writer day1)
       (gen-background-image pdf-writer)
-      (let [table (doto (PdfPTable. number-of-columns)
+      (let [table (doto (PdfPTable. number-of-calendar-columns)
                     (.setHorizontalAlignment Element/ALIGN_TOP)
                     (.setKeepTogether true)
                     (.setTotalWidth table-width)
