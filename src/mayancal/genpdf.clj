@@ -11,6 +11,7 @@
 (defonce doc-margin-right (.floatValue 72.0))
 (defonce doc-margin-top (.floatValue 36.0))
 (defonce doc-margin-bottom (.floatValue 36.0))
+(defonce icon-cell-margin-right (.floatValue 0.0))
 (defonce month-cell-margin-right (.floatValue 48.0))
 (defonce number-of-calendar-columns 5)
 (defonce number-of-preface-columns 5)
@@ -27,10 +28,19 @@
 
 ;; font definitions
 (defonce gregor-font (Font. Font$FontFamily/HELVETICA (.floatValue 10.0) Font/NORMAL gregor-color))
+(defonce icon-label-font (Font. Font$FontFamily/HELVETICA (.floatValue 12.0) Font/BOLD))
 (defonce label-font (Font. Font$FontFamily/HELVETICA (.floatValue 16.0) Font/BOLD))
 (defonce month-font (Font. Font$FontFamily/HELVETICA (.floatValue 18.0) Font/BOLD))
 (defonce tzday-font (Font. Font$FontFamily/HELVETICA (.floatValue 10.0) Font/NORMAL tzday-color))
 (defonce tzindex-font (Font. Font$FontFamily/HELVETICA (.floatValue 12.0) Font/BOLD))
+
+;; misc definitions
+(defonce icon-props {
+  :haab { :title "Haab: Month Names and Translations" :scalePct 45.0
+          :path "resources/MonthIcons/" }
+  :tzolkin { :title "Tzolk'in: Day Names and Translations" :scalePct 35.0
+             :path "resources/DayIcons/" } })
+(defonce month-image-path "resources/MonthPics/")
 
 
 (defn- add-metadata [document]
@@ -60,7 +70,7 @@
   (gen-background-image pdf-writer)
   (let [ page-height (.getHeight PageSize/LETTER)
          page-width (.getWidth PageSize/LETTER)
-         img (Image/getInstance "resources/MonthPics/cover.png")
+         img (Image/getInstance "resources/cover.png")
          canvas (.getDirectContent pdf-writer) ]
     (.scaleToFit img page-height page-width)
     (.setAbsolutePosition img 0 0)
@@ -70,12 +80,10 @@
     (.newPage document) ))
 
 
-(declare make-blank-cell)                   ; REMOVE LATER forward declaration
-
-
-(defn make-label-cell [document pdf-writer label]
-  "Create and return the icon table title cell using the given label"
-  (let [ para (doto (Paragraph. label label-font)
+(defn make-label-cell [document pdf-writer unit-type]
+  "Create and return the icon table title cell for the given time unit type"
+  (let [ label (:title (unit-type icon-props))
+        para (doto (Paragraph. label label-font)
                 (.setAlignment Element/ALIGN_CENTER)) ]
     (doto (PdfPCell.)
       (.setColspan number-of-preface-columns)
@@ -89,7 +97,33 @@
 ))
 
 
-(defn gen-icon-table [document pdf-writer icon-data label]
+(defn- make-icon-cell [time-unit unit-type]
+  "Create and return the icon label/image cell using info from the given time-unit"
+  (let [ para (Paragraph. (:title time-unit) icon-label-font)
+;        (doto (Paragraph. (:title time-unit) icon-label-font)
+;                (.setAlignment Element/ALIGN_CENTER)
+;                (.setIndentationRight icon-cell-margin-right) )
+         glyph-path (str (:path (unit-type icon-props)) (:glyph time-unit))
+         icon-cell (PdfPCell.) ]
+
+    (doto icon-cell
+      (.setBackgroundColor cell-color)
+      (.setHorizontalAlignment Element/ALIGN_RIGHT)
+      (.setVerticalAlignment Element/ALIGN_BOTTOM)
+      (.setUseDescender true) )
+
+    (when-let [glyph-img (Image/getInstance glyph-path)]
+      (.scalePercent glyph-img (:scalePct (unit-type icon-props)))
+;      (.setAlignment glyph-img Image/TEXTWRAP)
+      (.add para Chunk/NEWLINE)
+      (.add para (Chunk. glyph-img 0 0 true)) )
+
+    (doto icon-cell
+      (.addElement para))                   ; returns the icon-cell
+))
+
+
+(defn gen-icon-table [document pdf-writer icon-data unit-type]
   "Generate a table of day or month icons"
   (gen-background-image pdf-writer)
   (let [table (doto (PdfPTable. number-of-preface-columns)
@@ -98,11 +132,10 @@
                 (.setTotalWidth table-width)
                 (.setLockedWidth true)) ]
     (.setBackgroundColor (.getDefaultCell table) cell-color)
-    (.addCell table (make-label-cell document pdf-writer label))
+    (.addCell table (make-label-cell document pdf-writer unit-type))
 
-    (doseq [unit icon-data]
-;      (.addCell table (make-icon-cell unit)) )
-      (.addCell table (make-blank-cell 0)) )
+    (doseq [time-unit icon-data]
+      (.addCell table (make-icon-cell time-unit unit-type)) )
     (.completeRow table)
     (.add document table)
   )
@@ -112,16 +145,15 @@
 
 (defn- gen-preface [document pdf-writer]
   "Generate the preface pages"
-  (gen-icon-table document pdf-writer mcal/haab "Haab: Month Names and Translations")
-  (gen-icon-table document pdf-writer mcal/tzolkin "Tzolk'in: Day Names and Translations")
+  (gen-icon-table document pdf-writer mcal/haab :haab)
+  (gen-icon-table document pdf-writer mcal/tzolkin :tzolkin)
 )
 
 (defn- gen-month-image [document pdf-writer day]
   "Generate the picture page for the current month"
   (let [ page-height (.getHeight PageSize/LETTER)
          page-width (.getWidth PageSize/LETTER)
-         img-filename (:image (:haab day))
-         img (Image/getInstance (str "resources/MonthPics/" img-filename))
+         img (Image/getInstance (str month-image-path (:image (:haab day))))
          canvas (.getDirectContent pdf-writer) ]
     (.scaleToFit img page-height page-width)
     (.setAbsolutePosition img 0 0)
@@ -135,7 +167,7 @@
   (let [ para (doto (Paragraph. (:title (:haab day)) month-font)
                 (.setAlignment Element/ALIGN_RIGHT)
                 (.setIndentationRight month-cell-margin-right) )
-         glyph-filename (:glyph (:haab day))
+         glyph-path (str (:path (:haab icon-props)) (:glyph (:haab day)))
          month-cell (PdfPCell.) ]
 
     (doto month-cell
@@ -147,11 +179,10 @@
       (.setPaddingTop 15)
       (.setUseDescender true) )
 
-    (when glyph-filename
-      (when-let [glyph-img (Image/getInstance (str "resources/MonthIcons/" glyph-filename))]
-        (.scalePercent glyph-img 50.0)
-        (.setAlignment glyph-img Image/TEXTWRAP)
-        (.add para (Chunk. glyph-img 20 -15 true)) ))
+    (when-let [glyph-img (Image/getInstance glyph-path)]
+      (.scalePercent glyph-img 50.0)
+      (.setAlignment glyph-img Image/TEXTWRAP)
+      (.add para (Chunk. glyph-img 20 -15 true)) )
 
     (doto month-cell
       (.addElement para))                   ; returns the month-cell
@@ -188,10 +219,10 @@
                 (.add Chunk/NEWLINE)) ]
     (dotimes [x 4] (.add para Chunk/NEWLINE))
     (doto (PdfPCell.)
-      (.setUseDescender true)
       (.setBackgroundColor cell-color)
       (.setHorizontalAlignment Element/ALIGN_TOP)
       (.setVerticalAlignment Element/ALIGN_RIGHT)
+      (.setUseDescender true)
       (.addElement para) )))
 
 
