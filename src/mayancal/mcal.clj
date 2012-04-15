@@ -69,10 +69,6 @@
   (concat (reduce concat [] (repeat 18 (range 20))) (range 5)))
 
 
-;; given the annual cycle of haab days, offset by the given number of months and days
-(defn offset-into-haab-cycle [months days cycle]
-  (drop (+ days (* months 20)) cycle))
-
 ;; given an annual cycle of days or day numbers, offset by the given number of days.
 (defn offset-into-cycle [units cycle] (drop units cycle))
 
@@ -86,10 +82,8 @@
 (defn make-calround-cycle [options]
   "Return a lazy sequence of aligned sequences of Gregorian, Haab, Trecena, and Tzolkin cycles"
   (let [ year (:year options)
-         hd-offset (:hd-offset options)
-         hm-offset (:hm-offset options)
-         haab-cyc (offset-into-haab-cycle hm-offset hd-offset (cycle haab-seq))
-         haab-number-cyc (offset-into-haab-cycle hm-offset hd-offset (cycle haab-number-seq))
+         haab-cyc (offset-into-cycle (:haab-offset options) (cycle haab-seq))
+         haab-number-cyc (offset-into-cycle (:haab-offset options) (cycle haab-number-seq))
          tzolkin-cyc (offset-into-cycle (:tz-offset options) (cycle tzolkin))
          trecena-cyc (offset-into-cycle (:tr-offset options) (cycle (range 1 14)))
         ]
@@ -99,9 +93,11 @@
 
 
 ;; main method to create and return the round calendar
-(defn roundcal-year [options]
+(defn roundcal-year [user-args]
   "Create and return a round calendar sequence for the specified year"
-  (let [ days-in-year (find-days-in-year (:year options)) ]
+  (let [ offsets1900 {:haab-offset 246 :tz-offset 17 :tr-offset 3}
+         options (merge offsets1900 user-args)
+         days-in-year (find-days-in-year (:year options)) ]
     (partition-by #(:haab %)
                   (map #(apply hash-map
                                (interleave [:gregorian :haab :haab-number :trecena :tzolkin] %))

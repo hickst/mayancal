@@ -10,7 +10,8 @@
          [options other-args flag-usage]
            (cli/cli args
              ["-bn" "--basename"   "The basename (without extension) for the output PDF file"]
-             ["-y"  "--year"       "Gregorian year for calendar" :parse-fn #(Integer. %) :default 2012]
+             ["-y"  "--year"       "Gregorian year for calendar (> 1900)"
+                                   :parse-fn #(Integer. %) :default 2012]
              ["-h"  "--help"       "Show usage message for this program" :flag true]
              ["-v"  "--verbose"    "Operate in verbose mode" :flag true] )]
 
@@ -31,8 +32,7 @@
 
 
     ;; generate a round calendar for the desired year and pass it to the PDF formatter
-    (let [ offsets {:hd-offset 13 :hm-offset 13 :tz-offset 4 :tr-offset 12}
-          roundcal (mcal/roundcal-year (merge offsets options)) ]
+    (let [ roundcal (mcal/roundcal-year options) ]
         (pdf/gen-cal roundcal (:basename options)))
 ))
 
