@@ -1,13 +1,17 @@
 # mayancal
 
-FIXME: write description
+Clojure program to generate a Mayan Calendar for a given year.
 
 ## Usage
 
-FIXME: write
+java -jar mayancal.jar -bn mcal [--year 19xx | 20xx]
+
+Example: java -jar mayancal.jar -bn mcal84 --year 1984
 
 ## License
 
-Copyright (C) 2012 FIXME
+Copyright (C) 2012 by Tom Hicks and Dianne Patterson.
 
 Distributed under the Eclipse Public License, the same as Clojure.
+
+All images used are believed to be appropriately unencumbered.

@@ -1,9 +1,9 @@
 (ns mayancal.mcal
   (:require [clojure.stacktrace :as st]))
 
-(defn gregorian-date-seq [year]
-  "Return an infinite sequence of Gregorian date strings starting on January 1st of the given year"
-  (let [ start-date (java.util.GregorianCalendar. year 0 0 0 0)
+(defn gregorian-date-seq []
+  "Return an infinite sequence of Gregorian date strings starting on January 1st of 1900"
+  (let [ start-date (java.util.GregorianCalendar. 1900 0 0 0 0)
          gd-format (java.text.SimpleDateFormat. "EEE M/d/yyyy") ]
     (repeatedly
       (fn []
@@ -69,35 +69,39 @@
   (concat (reduce concat [] (repeat 18 (range 20))) (range 5)))
 
 
-;; given an annual cycle of days or day numbers, offset by the given number of days.
-(defn offset-into-cycle [units cycle] (drop units cycle))
-
+(defn days-between-1900-and-year [year]
+  "Return the number of days between 1/1/1900 and 1/1/year"
+  (let [ start-millis (.getTimeInMillis (java.util.GregorianCalendar. 1900 0 0 0 0))
+         end-millis (.getTimeInMillis (java.util.GregorianCalendar. year 0 0 0 0)) ]
+    (/ (- end-millis start-millis) 86400000) ; 24 hours * 60 min * 60 sec * 1000 ms
+))
 
 (defn find-days-in-year [year]
   "Return the number of days in the given year"
   (if (.isLeapYear (java.util.GregorianCalendar.) year) 366 365))
 
+(def transpose
+  "Transpose a finite sequence of infinite sequences into an infinite sequence of finite sequences"
+  (partial apply map vector))
+
 
 ;; create aligned sequences of Gregorian, Haab, Trecena, and Tzolkin cycles
 (defn make-calround-cycle [options]
-  "Return a lazy sequence of aligned sequences of Gregorian, Haab, Trecena, and Tzolkin cycles"
-  (let [ year (:year options)
-         haab-cyc (offset-into-cycle (:haab-offset options) (cycle haab-seq))
-         haab-number-cyc (offset-into-cycle (:haab-offset options) (cycle haab-number-seq))
-         tzolkin-cyc (offset-into-cycle (:tz-offset options) (cycle tzolkin))
-         trecena-cyc (offset-into-cycle (:tr-offset options) (cycle (range 1 14)))
-        ]
-  (map (fn [& args] args)
-       (gregorian-date-seq year) haab-cyc haab-number-cyc trecena-cyc tzolkin-cyc)
-))
+  "Return an infinite lazy sequence of tuples of Gregorian, Haab, Trecena, and Tzolkin day info"
+  (let [ days-since-1900 (days-between-1900-and-year (:year options))
+         greg-seq (gregorian-date-seq)                      ; starts at 1/1/1900
+         haab-cyc (drop 246 (cycle haab-seq))               ; sync cycle to 1/1/1900
+         haab-number-cyc (drop 246 (cycle haab-number-seq)) ; sync cycle to 1/1/1900
+         tzolkin-cyc (drop 17 (cycle tzolkin))              ; sync cycle to 1/1/1900
+         trecena-cyc (drop 3 (cycle (range 1 14))) ]        ; sync cycle to 1/1/1900
+    (transpose (map #(drop days-since-1900 %)
+                    [greg-seq haab-cyc haab-number-cyc trecena-cyc tzolkin-cyc])) ))
 
 
 ;; main method to create and return the round calendar
-(defn roundcal-year [user-args]
+(defn roundcal-year [options]
   "Create and return a round calendar sequence for the specified year"
-  (let [ offsets1900 {:haab-offset 246 :tz-offset 17 :tr-offset 3}
-         options (merge offsets1900 user-args)
-         days-in-year (find-days-in-year (:year options)) ]
+  (let [ days-in-year (find-days-in-year (:year options)) ]
     (partition-by #(:haab %)
                   (map #(apply hash-map
                                (interleave [:gregorian :haab :haab-number :trecena :tzolkin] %))
