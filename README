@@ -12,6 +12,15 @@ Example: java -jar mayancal.jar -bn mcal84 --year 1984
 
 Copyright (C) 2012 by Tom Hicks and Dianne Patterson.
 
-Distributed under the Eclipse Public License, the same as Clojure.
-
 All images used are believed to be appropriately unencumbered.
+
+## TODO (notes to self)
+
+Front and Back covers
+Attributions page (inside back cover?)
+Center image-only pages and add margins
+Add chapters with month names
+License files
+Resize cells?
+Table borders?
+Recheck special cases: Uayeb and last month
