@@ -5,5 +5,5 @@
                   [com.itextpdf/itextpdf "5.1.3"]
                   [com.itextpdf.tool/xmlworker "1.1.1"] ]
   :main mayancal.core
-  :uberjar-name mayancal.jar
+  :uberjar-name "mayancal.jar"
 )
