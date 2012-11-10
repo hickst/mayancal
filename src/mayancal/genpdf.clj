@@ -1,5 +1,6 @@
 (ns mayancal.genpdf
-  (:require [mayancal.mcal :as mcal :only (haab tzolkin)])
+  (:require [clojure.java.io :as cjio]
+            [mayancal.mcal :as mcal :only (haab tzolkin)])
   (:import [com.itextpdf.text BaseColor Chunk Document DocumentException Element
                               Font Font$FontFamily Image PageSize Paragraph])
   (:import [com.itextpdf.text.pdf PdfContentByte PdfPCell PdfPTable PdfWriter]) )
@@ -37,10 +38,10 @@
 ;; misc definitions
 (defonce icon-props {
   :haab { :title "Haab: Month Names and Translations" :scalePct 45.0
-          :path "resources/MonthIcons/" }
+          :path "MonthIcons/" }
   :tzolkin { :title "Tzolk'in: Day Names and Translations" :scalePct 35.0
-             :path "resources/DayIcons/" } })
-(defonce month-image-path "resources/MonthPics/")
+             :path "DayIcons/" } })
+(defonce month-image-path "MonthPics/")
 
 
 (defn- add-metadata [document]
@@ -55,7 +56,7 @@
   (let [ page-height (.getHeight PageSize/LETTER)
          page-width (.getWidth PageSize/LETTER)
          under (.getDirectContentUnder pdf-writer)
-         img (Image/getInstance "resources/codexpaper.jpg") ]
+         img (Image/getInstance (cjio/resource "codexpaper.jpg")) ]
     (doto img
       (.scaleToFit page-height page-width)
       (.setAlignment Element/ALIGN_CENTER)
@@ -70,7 +71,7 @@
   (gen-background-image pdf-writer)
   (let [ page-height (.getHeight PageSize/LETTER)
          page-width (.getWidth PageSize/LETTER)
-         img (Image/getInstance "resources/cover.png")
+         img (Image/getInstance (cjio/resource "cover.png"))
          canvas (.getDirectContent pdf-writer) ]
     (.scaleToFit img page-height page-width)
     (.setAbsolutePosition img 0 0)
@@ -112,7 +113,7 @@
       (.setVerticalAlignment Element/ALIGN_BOTTOM)
       (.setUseDescender true) )
 
-    (when-let [glyph-img (Image/getInstance glyph-path)]
+    (when-let [glyph-img (Image/getInstance (cjio/resource glyph-path))]
       (.scalePercent glyph-img (:scalePct (unit-type icon-props)))
 ;      (.setAlignment glyph-img Image/TEXTWRAP)
       (.add para Chunk/NEWLINE)
@@ -153,7 +154,7 @@
   "Generate the picture page for the current month"
   (let [ page-height (.getHeight PageSize/LETTER)
          page-width (.getWidth PageSize/LETTER)
-         img (Image/getInstance (str month-image-path (:image (:haab day))))
+         img (Image/getInstance (cjio/resource (str month-image-path (:image (:haab day)))))
          canvas (.getDirectContent pdf-writer) ]
     (.scaleToFit img page-height page-width)
     (.setAbsolutePosition img 0 0)
@@ -179,7 +180,7 @@
       (.setPaddingTop 15)
       (.setUseDescender true) )
 
-    (when-let [glyph-img (Image/getInstance glyph-path)]
+    (when-let [glyph-img (Image/getInstance (cjio/resource glyph-path))]
       (.scalePercent glyph-img 50.0)
       (.setAlignment glyph-img Image/TEXTWRAP)
       (.add para (Chunk. glyph-img 20 -15 true)) )
