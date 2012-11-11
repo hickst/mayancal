@@ -2,23 +2,48 @@
 
 Clojure program to generate a Mayan Calendar for a given year.
 
+
 ## Usage
 
 java -jar mayancal.jar -bn mcal [--year 19xx | 20xx]
 
 Example: java -jar mayancal.jar -bn mcal84 --year 1984
 
+
 ## License
 
-Copyright (C) 2012 by Tom Hicks and Dianne Patterson.
+Copyright (C) 2012 by Tohono Consulting, LLC.
 
-All images used are believed to be appropriately unencumbered.
+The use and distribution terms for this software are covered by the
+Eclipse Public License 1.0, which can be found in the LICENSE file
+at the root of this distribution. By using this software in any fashion,
+you are agreeing to be bound by the terms of this license. You
+must not remove this notice, or any other, from this software.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+Eclipse Public License for more details.
+
+You should have received a copy of the Eclipse Public License
+along with this program. If not, see http://opensource.org/licenses/eclipse-1.0.php.
+
+Tohono Consulting LLC may be contacted at the following address:
+       Tohono Consulting LLC
+       4950 N. Via Entrada
+       Tucson, Arizona 85718
+       webmaster@tohono.com
+
+This software uses libraries copyrighted and licensed by the iText Software Corp
+(http://itextpdf.com/contact.php). iText software is licensed under the
+GNU Affero General Public License (AGPL). A copy of the AGPL can be found
+at the root of this distribution in the AGP-LICENSE file.
+
 
 ## TODO (notes to self)
 
 Attributions page (inside back cover?)
 Rescale Front cover
-Add License files
 Add chapters with month names
 Special table borders?
 Recheck special cases: Uayeb and last month

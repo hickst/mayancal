@@ -1,3 +1,19 @@
+;; Copyright (C) 2012 by Tohono Consulting, LLC.
+
+;; The use and distribution terms for this software are covered by the
+;; Eclipse Public License 1.0, which can be found in the LICENSE file
+;; at the root of this distribution. By using this software in any fashion,
+;; you are agreeing to be bound by the terms of this license. You
+;; must not remove this notice, or any other, from this software.
+
+;; This program is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+;; Eclipse Public License for more details.
+
+;; You should have received a copy of the Eclipse Public License
+;; along with this program. If not, see http://opensource.org/licenses/eclipse-1.0.php.
+
 (ns mayancal.mcal
   (:require [clojure.stacktrace :as st]))
 
