@@ -14,6 +14,7 @@
 (defonce doc-margin-bottom (.floatValue 36.0))
 (defonce icon-cell-bottom-padding (.floatValue 4.0))
 (defonce icon-cell-side-padding (.floatValue 7.0))
+(defonce image-shrink-factor (.floatValue 0.85))
 (defonce month-cell-margin-right (.floatValue 48.0))
 (defonce number-of-calendar-columns 5)
 (defonce number-of-preface-columns 5)
@@ -71,7 +72,7 @@
          page-height (.getWidth PageSize/LETTER)  ;; note reversal of W-H for landscape mode
          img (Image/getInstance (cjio/resource image-name))
          canvas (.getDirectContent pdf-writer) ]
-    (.scaleToFit img page-width page-height)
+    (.scaleToFit img (* page-width image-shrink-factor) (* page-height image-shrink-factor))
     (.setAbsolutePosition img (/ (- page-width (.getScaledWidth img)) 2)
                               (/ (- page-height (.getScaledHeight img)) 2) )
     (.addImage canvas img)
