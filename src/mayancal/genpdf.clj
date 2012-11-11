@@ -53,32 +53,34 @@
 
 (defn- gen-background-image [pdf-writer]
   "Generate the background image of textured paper onto the current page"
-  (let [ page-height (.getHeight PageSize/LETTER)
-         page-width (.getWidth PageSize/LETTER)
+  (let [ page-width (.getHeight PageSize/LETTER)  ;; note reversal of W-H for landscape mode
+         page-height (.getWidth PageSize/LETTER)  ;; note reversal of W-H for landscape mode
          under (.getDirectContentUnder pdf-writer)
          img (Image/getInstance (cjio/resource "codexpaper.jpg")) ]
-    (doto img
-      (.scaleToFit page-height page-width)
-      (.setAlignment Element/ALIGN_CENTER)
-      (.setAbsolutePosition 0 0) )
+    (.scaleToFit img page-width page-height)
+    (.setAbsolutePosition img 0 0)
     (.saveState under)
     (.addImage under img)
     (.restoreState under) ))
 
 
+(defn- gen-image-page [document pdf-writer image-name]
+  "Generate the picture page for the current month"
+  (let [ page-width (.getHeight PageSize/LETTER)  ;; note reversal of W-H for landscape mode
+         page-height (.getWidth PageSize/LETTER)  ;; note reversal of W-H for landscape mode
+         img (Image/getInstance (cjio/resource image-name))
+         canvas (.getDirectContent pdf-writer) ]
+    (.scaleToFit img page-width page-height)
+    (.setAbsolutePosition img (/ (- page-width (.getScaledWidth img)) 2)
+                              (/ (- page-height (.getScaledHeight img)) 2) )
+    (.addImage canvas img)
+    (.newPage document) ))
+
+
 (defn- gen-cover [document pdf-writer]
   "Generate the cover page"
   (gen-background-image pdf-writer)
-  (let [ page-height (.getHeight PageSize/LETTER)
-         page-width (.getWidth PageSize/LETTER)
-         img (Image/getInstance (cjio/resource "cover.png"))
-         canvas (.getDirectContent pdf-writer) ]
-    (.scaleToFit img page-height page-width)
-    (.setAbsolutePosition img 0 0)
-    ;; (.setAbsolutePosition img (/ (- page-height (.getScaledHeight img)) 2)
-    ;;                           (/ (- page-width (.getScaledWidth img)) 2) )
-    (.addImage canvas img)
-    (.newPage document) ))
+  (gen-image-page document pdf-writer "cover.png"))
 
 
 (defn make-label-cell [document pdf-writer unit-type]
@@ -90,7 +92,7 @@
       (.setColspan number-of-preface-columns)
       (.setBackgroundColor header-color)
       (.setHorizontalAlignment Element/ALIGN_MIDDLE)
-      ; (.setVerticalAlignment Element/ALIGN_CENTER)
+;     (.setVerticalAlignment Element/ALIGN_CENTER)
       (.setPaddingBottom 15)
       (.setPaddingTop 15)
       (.setUseDescender true)
@@ -149,17 +151,6 @@
   (gen-icon-table document pdf-writer mcal/haab :haab)
   (gen-icon-table document pdf-writer mcal/tzolkin :tzolkin)
 )
-
-(defn- gen-month-image [document pdf-writer day]
-  "Generate the picture page for the current month"
-  (let [ page-height (.getHeight PageSize/LETTER)
-         page-width (.getWidth PageSize/LETTER)
-         img (Image/getInstance (cjio/resource (str month-image-path (:image (:haab day)))))
-         canvas (.getDirectContent pdf-writer) ]
-    (.scaleToFit img page-height page-width)
-    (.setAbsolutePosition img 0 0)
-    (.addImage canvas img)
-    (.newPage document) ))
 
 
 (defn- make-month-cell [day]
@@ -234,7 +225,7 @@
            month-name (:name (:haab day1))
            skip-blanks (or (= month-name "wayeb") (= month (last roundcal))) ]
       (gen-background-image pdf-writer)
-      (gen-month-image document pdf-writer day1)
+      (gen-image-page document pdf-writer (str month-image-path (:image (:haab day1))))
       (gen-background-image pdf-writer)
       (let [table (doto (PdfPTable. number-of-calendar-columns)
                     (.setHorizontalAlignment Element/ALIGN_TOP)
@@ -274,3 +265,6 @@
     (gen-postface document pdf-writer)
     (.close document)
 ))
+
+;; (println "pgH=" page-height ", pgW=" page-width ", scH=" scaled-height ", scW=" scaled-width)
+;; (println "absPx=" (.getAbsoluteX img) (.getAbsoluteY img))
