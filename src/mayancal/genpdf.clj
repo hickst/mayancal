@@ -12,7 +12,8 @@
 (defonce doc-margin-right (.floatValue 72.0))
 (defonce doc-margin-top (.floatValue 36.0))
 (defonce doc-margin-bottom (.floatValue 36.0))
-(defonce icon-cell-margin-right (.floatValue 0.0))
+(defonce icon-cell-bottom-padding (.floatValue 4.0))
+(defonce icon-cell-side-padding (.floatValue 7.0))
 (defonce month-cell-margin-right (.floatValue 48.0))
 (defonce number-of-calendar-columns 5)
 (defonce number-of-preface-columns 5)
@@ -92,7 +93,6 @@
       (.setColspan number-of-preface-columns)
       (.setBackgroundColor header-color)
       (.setHorizontalAlignment Element/ALIGN_MIDDLE)
-;     (.setVerticalAlignment Element/ALIGN_CENTER)
       (.setPaddingBottom 15)
       (.setPaddingTop 15)
       (.setUseDescender true)
@@ -103,23 +103,22 @@
 (defn- make-icon-cell [time-unit unit-type]
   "Create and return the icon label/image cell using info from the given time-unit"
   (let [ para (Paragraph. (:title time-unit) icon-label-font)
-;        (doto (Paragraph. (:title time-unit) icon-label-font)
-;                (.setAlignment Element/ALIGN_CENTER)
-;                (.setIndentationRight icon-cell-margin-right) )
          glyph-path (str (:path (unit-type icon-props)) (:glyph time-unit))
          icon-cell (PdfPCell.) ]
 
     (doto icon-cell
       (.setBackgroundColor cell-color)
-      (.setHorizontalAlignment Element/ALIGN_RIGHT)
-      (.setVerticalAlignment Element/ALIGN_BOTTOM)
+      (.setHorizontalAlignment Element/ALIGN_LEFT)
+      (.setVerticalAlignment Element/ALIGN_TOP)
+      (.setPaddingLeft icon-cell-side-padding)
+      (.setPaddingRight icon-cell-side-padding)
+      (.setPaddingBottom icon-cell-bottom-padding)
       (.setUseDescender true) )
 
     (when-let [glyph-img (Image/getInstance (cjio/resource glyph-path))]
       (.scalePercent glyph-img (:scalePct (unit-type icon-props)))
-;      (.setAlignment glyph-img Image/TEXTWRAP)
       (.add para Chunk/NEWLINE)
-      (.add para (Chunk. glyph-img 0 0 true)) )
+      (.add para (Chunk. glyph-img (/ (.getScaledWidth glyph-img) 2) 0 true)) )
 
     (doto icon-cell
       (.addElement para))                   ; returns the icon-cell
@@ -265,6 +264,3 @@
     (gen-postface document pdf-writer)
     (.close document)
 ))
-
-;; (println "pgH=" page-height ", pgW=" page-width ", scH=" scaled-height ", scW=" scaled-width)
-;; (println "absPx=" (.getAbsoluteX img) (.getAbsoluteY img))
