@@ -16,6 +16,7 @@
 
 (ns mayancal.genpdf
   (:require [clojure.java.io :as cjio]
+            [mayancal.content :as content]
             [mayancal.mcal :as mcal :only (haab tzolkin)])
   (:import [com.itextpdf.text BaseColor Chunk Document DocumentException Element
                               Font Font$FontFamily Image PageSize Paragraph])
@@ -32,9 +33,12 @@
 (defonce icon-cell-side-padding (.floatValue 7.0))
 (defonce image-shrink-factor (.floatValue 0.85))
 (defonce month-cell-margin-right (.floatValue 48.0))
+(defonce normal-spacing (.floatValue 5.0))
 (defonce number-of-calendar-columns 5)
 (defonce number-of-preface-columns 5)
 (defonce table-width (.floatValue 684.0))
+(defonce title-x-padding (.floatValue 7.0))
+(defonce title-y-padding (.floatValue 4.0))
 (defonce write-row-x-offset (.floatValue 45.0))
 (defonce write-row-y-offset (.floatValue 50.0))
 
@@ -43,6 +47,7 @@
 (defonce cell-color BaseColor/WHITE)
 (defonce gregor-color (BaseColor. 0x00 0x7F 0x00))
 (defonce header-color (BaseColor. 0xE9 0xFF 0xDF))
+(defonce title-color (BaseColor. 0xE9 0xFF 0xDF))
 (defonce tzday-color (BaseColor. 0x00 0x00 0x7F))
 
 ;; font definitions
@@ -50,6 +55,8 @@
 (defonce icon-label-font (Font. Font$FontFamily/HELVETICA (.floatValue 12.0) Font/BOLD))
 (defonce label-font (Font. Font$FontFamily/HELVETICA (.floatValue 16.0) Font/BOLD))
 (defonce month-font (Font. Font$FontFamily/HELVETICA (.floatValue 18.0) Font/BOLD))
+(defonce normal-font (Font. Font$FontFamily/HELVETICA (.floatValue 10.0) Font/NORMAL))
+(defonce title-font (Font. Font$FontFamily/HELVETICA (.floatValue 16.0) Font/BOLD))
 (defonce tzday-font (Font. Font$FontFamily/HELVETICA (.floatValue 10.0) Font/NORMAL tzday-color))
 (defonce tzindex-font (Font. Font$FontFamily/HELVETICA (.floatValue 12.0) Font/BOLD))
 
@@ -262,8 +269,58 @@
 
 
 (defn- gen-postface [document pdf-writer]
+  "Generate the back page"
   (gen-background-image pdf-writer)
-  (.add document (Paragraph. "Goodbye 2012!")) )
+
+  (.add document                            ; background title
+     (doto (Paragraph.)
+       (.setAlignment Element/ALIGN_CENTER)
+       (.setSpacingAfter normal-spacing)
+       (.add (doto (Chunk. (:title content/background) title-font)
+               (.setBackground title-color
+                               title-x-padding title-y-padding title-x-padding title-y-padding))) ))
+
+  (doseq [clause (:clauses content/background)]
+    (.add document                          ; background clauses
+      (doto (Paragraph.)
+        (.setSpacingBefore normal-spacing)
+        (.setAlignment Element/ALIGN_LEFT)
+        (.add (Chunk. clause normal-font)) )))
+
+  (.add document                            ; licenses title
+     (doto (Paragraph.)
+       (.setAlignment Element/ALIGN_CENTER)
+       (.setSpacingBefore (* 3.0 normal-spacing))
+       (.setSpacingAfter normal-spacing)
+       (.add (doto (Chunk. (:title content/license-text) title-font)
+               (.setBackground title-color
+                               title-x-padding title-y-padding title-x-padding title-y-padding))) ))
+
+  (doseq [clause (:clauses content/license-text)]
+    (.add document                          ; license clauses
+      (doto (Paragraph.)
+        (.setSpacingBefore normal-spacing)
+        (.setAlignment Element/ALIGN_LEFT)
+        (.add (Chunk. clause normal-font)) )))
+
+  (.add document                            ; acknowledgements title
+     (doto (Paragraph.)
+       (.setAlignment Element/ALIGN_CENTER)
+       (.setSpacingBefore (* 3.0 normal-spacing))
+       (.setSpacingAfter normal-spacing)
+       (.add (doto (Chunk. (:title content/acknowledgements) title-font)
+               (.setBackground title-color
+                               title-x-padding title-y-padding title-x-padding title-y-padding))) ))
+
+  (doseq [ack (:entries content/acknowledgements)]
+    (.add document                          ; image acknowledgements
+      (doto (Paragraph.)
+        (.setSpacingBefore normal-spacing)
+        (.setAlignment Element/ALIGN_LEFT)
+        (.add (Chunk. (:name ack) normal-font))
+        (.add (Chunk. ":    " normal-font))
+        (.add (Chunk. (:url ack) normal-font)) )))
+)
 
 
 (defn gen-cal [roundcal outfile]

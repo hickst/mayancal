@@ -1,6 +1,6 @@
 # mayancal
 
-Clojure program to generate a Mayan Calendar for a given year.
+Clojure program to generate a Mayan calendar for a given year.
 
 
 ## Usage
@@ -44,7 +44,6 @@ in the resources area of this distribution in the AGP-LICENSE file.
 ## TODO (notes to self)
 
 Frontis matter
-Attributions page (inside back cover?)
 Rescale Front cover
 Add chapters with month names
 Special table borders?
