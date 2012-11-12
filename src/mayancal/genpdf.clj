@@ -19,7 +19,7 @@
             [mayancal.content :as content]
             [mayancal.mcal :as mcal :only (haab tzolkin)])
   (:import [com.itextpdf.text BaseColor Chunk Document DocumentException Element
-                              Font Font$FontFamily Image PageSize Paragraph])
+                              Font Font$FontFamily Image PageSize Paragraph Version])
   (:import [com.itextpdf.text.pdf PdfAction PdfContentByte PdfPCell PdfPTable PdfWriter]) )
 
 
@@ -304,6 +304,13 @@
         (.setSpacingBefore normal-spacing)
         (.setAlignment Element/ALIGN_LEFT)
         (.add (Chunk. clause normal-font)) )))
+
+  (.add document                          ; version clauses
+    (doto (Paragraph.)
+      (.setSpacingBefore normal-spacing)
+      (.setAlignment Element/ALIGN_LEFT)
+      (.add (Chunk. (str "This calendar generated using "
+                         (.getVersion (Version/getInstance))) normal-font)) ))
 
   (.add document                            ; acknowledgements title
      (doto (Paragraph.)

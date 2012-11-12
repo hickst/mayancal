@@ -36,7 +36,7 @@
 (defonce acknowledgements
   { :title "Image Acknowledgements"
     :entries [
-      {:name "Front Cover"
+      {:name "FRONT COVER"
        :url "http://commons.wikimedia.org/wiki/File:Mayan_Zodiac_Circle.jpg" }
       {:name "PAX (GREAT PUMA)"
        :url "http://commons.wikimedia.org/wiki/File:Puma_Sleeping.jpg"}
