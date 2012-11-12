@@ -20,7 +20,7 @@
             [mayancal.mcal :as mcal :only (haab tzolkin)])
   (:import [com.itextpdf.text BaseColor Chunk Document DocumentException Element
                               Font Font$FontFamily Image PageSize Paragraph])
-  (:import [com.itextpdf.text.pdf PdfContentByte PdfPCell PdfPTable PdfWriter]) )
+  (:import [com.itextpdf.text.pdf PdfAction PdfContentByte PdfPCell PdfPTable PdfWriter]) )
 
 
 ;; size definitions:
@@ -47,12 +47,14 @@
 (defonce cell-color BaseColor/WHITE)
 (defonce gregor-color (BaseColor. 0x00 0x7F 0x00))
 (defonce header-color (BaseColor. 0xE9 0xFF 0xDF))
+(defonce link-color (BaseColor. 0x00 0x00 0x7F))
 (defonce title-color (BaseColor. 0xE9 0xFF 0xDF))
 (defonce tzday-color (BaseColor. 0x00 0x00 0x7F))
 
 ;; font definitions
 (defonce gregor-font (Font. Font$FontFamily/HELVETICA (.floatValue 10.0) Font/NORMAL gregor-color))
 (defonce icon-label-font (Font. Font$FontFamily/HELVETICA (.floatValue 12.0) Font/BOLD))
+(defonce link-font (Font. Font$FontFamily/HELVETICA (.floatValue 10.0) Font/NORMAL link-color))
 (defonce label-font (Font. Font$FontFamily/HELVETICA (.floatValue 16.0) Font/BOLD))
 (defonce month-font (Font. Font$FontFamily/HELVETICA (.floatValue 18.0) Font/BOLD))
 (defonce normal-font (Font. Font$FontFamily/HELVETICA (.floatValue 10.0) Font/NORMAL))
@@ -319,7 +321,8 @@
         (.setAlignment Element/ALIGN_LEFT)
         (.add (Chunk. (:name ack) normal-font))
         (.add (Chunk. ":    " normal-font))
-        (.add (Chunk. (:url ack) normal-font)) )))
+        (.add (doto (Chunk. (:url ack) link-font)
+                (.setAction (PdfAction. (:url ack) true)))) )))
 )
 
 
