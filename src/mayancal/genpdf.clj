@@ -20,7 +20,8 @@
             [mayancal.mcal :as mcal :only (haab tzolkin)])
   (:import [com.itextpdf.text BaseColor Chunk Document DocumentException Element
                               Font Font$FontFamily Image PageSize Paragraph Version])
-  (:import [com.itextpdf.text.pdf PdfAction PdfContentByte PdfPCell PdfPTable PdfWriter]) )
+  (:import [com.itextpdf.text.pdf PdfAction PdfContentByte PdfPCell PdfDestination
+                                  PdfOutline PdfPTable PdfWriter]) )
 
 
 ;; size definitions:
@@ -106,6 +107,7 @@
 
 (defn- gen-cover [document pdf-writer]
   "Generate the cover page"
+  (PdfOutline. (.getRootOutline pdf-writer) (PdfDestination. PdfDestination/FITH) "Cover" true)
   (gen-background-image pdf-writer)
   (gen-image-page document pdf-writer "cover.png"))
 
@@ -153,7 +155,11 @@
 
 (defn gen-icon-table [document pdf-writer icon-data unit-type]
   "Generate a table of day or month icons"
+  (PdfOutline. (.getRootOutline pdf-writer)
+               (PdfDestination. PdfDestination/FITH)
+               (:title (unit-type icon-props)) true)
   (gen-background-image pdf-writer)
+
   (let [table (doto (PdfPTable. number-of-preface-columns)
                 (.setHorizontalAlignment Element/ALIGN_TOP)
                 (.setKeepTogether true)
@@ -248,9 +254,18 @@
   (doseq [month roundcal]
     (let [ day1 (first month)
            month-name (:name (:haab day1))
+           month-title (:title (:haab day1))
            skip-blanks (or (= month-name "wayeb") (= month (last roundcal))) ]
+
+      (PdfOutline. (.getRootOutline pdf-writer)
+                   (PdfDestination. PdfDestination/FITH)
+                   (str month-title ": Image") true)
       (gen-background-image pdf-writer)
       (gen-image-page document pdf-writer (str month-image-path (:image (:haab day1))))
+
+      (PdfOutline. (.getRootOutline pdf-writer)
+                   (PdfDestination. PdfDestination/FITH)
+                   (str month-title ": Calendar") true)
       (gen-background-image pdf-writer)
       (let [table (doto (PdfPTable. number-of-calendar-columns)
                     (.setHorizontalAlignment Element/ALIGN_TOP)
@@ -272,6 +287,9 @@
 
 (defn- gen-postface [document pdf-writer]
   "Generate the back page"
+  (PdfOutline. (.getRootOutline pdf-writer)
+               (PdfDestination. PdfDestination/FITH)
+               (:title content/background) true)
   (gen-background-image pdf-writer)
 
   (.add document                            ; background title
