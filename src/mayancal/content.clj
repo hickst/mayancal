@@ -45,14 +45,25 @@
   { :title "The Long Count"
     :links [ "http://www.michielb.nl/maya/calendar.html"
              "http://en.wikipedia.org/wiki/Maya_calendar"
-          ]
+    ]
     :clauses [
       "The Maya used special glyphs to indicate various periods of time. The Kin represented one day. A period of 20 days made up a Uinal, a single \"month\" in the Haab cycle. The Tun was a year of 360 days and the K'atun was 20 years of 360 days each. The end of the K'atun was a special time period celebrated by the Maya. The Maya also counted 400 year periods called B'ak'tuns. [1]"
 
-      "All of the aforementioned time periods were used by the Maya in a special day numbering system which is now called the Long Count. Typically, a Long Count date is written as a conjunction of these named periods. For example, the Long Count 9.14.12.2.17 represents 9 B'ak'tuns, 14 K'atuns, 12 Tuns, 2 Uinals and 17 K'ins. [1]  The Long Count calendar identifies a date by counting the number of days from the Mayan creation date 4 Ajaw, 8 Kumk'u (mid 3114 B.C.). Instead of using a base-10 (decimal) scheme like Western numbering, the Long Count days were tallied in a modified base-20 scheme. Thus, 0.0.0.1.5 is equal to 25, and 0.0.0.2.0 is equal to 40. [2]"
+      "All of the aforementioned time periods were used by the Maya in a special day numbering system which is now called the Long Count. Typically, a Long Count date is written as a conjunction of these named periods. For example, the Long Count 9.14.12.2.17 represents 9 B'ak'tuns, 14 K'atuns, 12 Tuns, 2 Uinals and 17 K'ins. [1]  The Long Count calendar identifies a date by counting the number of days from the Mayan creation date 4 Ajaw, 8 Kumk'u. The number of days since the Mayan creation date is found by multiplying each position by its base (see the table below). Thus, the Long Count date 0.0.0.1.5 is day 25, the Long Count date 0.0.0.2.0 is day 40, and the Long Count date 0.0.1.0.0 is day 360 (as there are only 18 Uinal in a Tun)."
 
-      "The current Great Cycle, which began in 3114 B.C. is scheduled to end on December 21st, 2012 A.D. Despite some apocalyptic hype, this is merely the end of the current 13-B'ak'tun cycle and the beginning of the next one."
-]})
+      "The current Great Cycle, which began in mid 3114 B.C. is scheduled to end on December 21st, 2012 A.D. Despite some apocalyptic hype, this is merely the end of the current 13-B'ak'tun cycle and the beginning of the next one."
+    ]
+    :table {
+      :title "Time Periods of the Long Count"
+      :rows [
+             [ "Kin" "" "1 day" "" ]
+             [ "Uinal" "20 Kin" "20 days" "" ]
+             [ "Tun" "18 Uinal" "360 days" "~1 year" ]
+             [ "K'atun" "20 Tuns" "7200 days" "~20 (19.7) years" ]
+             [ "B'ak'tun" "20 Katuns" "144,000 days" "~400 (394.5) years" ]
+             [ "Great Cycle" "13 B'ak'tuns" "1,872,000 days" "~5200 (5128.8) years" ]
+      ]}
+})
 
 
 (defonce license-text

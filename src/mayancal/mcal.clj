@@ -65,7 +65,7 @@
   { :name "chen"   :title "Ch'en (Cave of the Moon)"   :glyph "chen_glyph.png"   :image "chen.png" }
   { :name "yax"    :title "Yax (Green, New)"           :glyph "yax_glyph.png"    :image "yax.png" }
   { :name "sak"    :title "Sak (White, Frog)"          :glyph "zak_glyph.png"    :image "zak.png" }
-  { :name "keh"    :title "Keh (Red, Red Deer)"        :glyph "keh_glyph.png"    :image "keh.gif" }
+  { :name "keh"    :title "Keh (Red Deer, Red)"        :glyph "keh_glyph.png"    :image "keh.gif" }
   { :name "mak"    :title "Mak (Enclosure)"            :glyph "mak_glyph.png"    :image "mak.png" }
   { :name "kankin" :title "K'ank'in (Underworld Dog)"  :glyph "kankin_glyph.png" :image "kankin.png" }
   { :name "muwan"  :title "Muwan (Screech Owl)"        :glyph "muan_glyph.png"   :image "muan.png" }

@@ -26,13 +26,13 @@
 
 ;; size definitions:
 (defonce day-cell-margin-right (.floatValue 5.0))
+(defonce default-shrink-factor (.floatValue 0.85))
 (defonce doc-margin-left (.floatValue 72.0))
 (defonce doc-margin-right (.floatValue 72.0))
 (defonce doc-margin-top (.floatValue 36.0))
 (defonce doc-margin-bottom (.floatValue 36.0))
 (defonce icon-cell-bottom-padding (.floatValue 4.0))
 (defonce icon-cell-side-padding (.floatValue 7.0))
-(defonce image-shrink-factor (.floatValue 0.85))
 (defonce month-cell-margin-right (.floatValue 48.0))
 (defonce normal-spacing (.floatValue 5.0))
 (defonce number-of-calendar-columns 5)
@@ -93,12 +93,14 @@
     (.restoreState under) ))
 
 
-(defn- gen-image-page [document pdf-writer image-name]
+(defn- gen-image-page [document pdf-writer image-name & extrargs]
   "Generate the picture page for the current month"
   (let [ page-width (.getHeight PageSize/LETTER)  ;; note reversal of W-H for landscape mode
          page-height (.getWidth PageSize/LETTER)  ;; note reversal of W-H for landscape mode
          img (Image/getInstance (cjio/resource image-name))
-         canvas (.getDirectContent pdf-writer) ]
+         canvas (.getDirectContent pdf-writer)
+         image-shrink-factor (or (first extrargs) default-shrink-factor)
+        ]
     (.scaleToFit img (* page-width image-shrink-factor) (* page-height image-shrink-factor))
     (.setAbsolutePosition img (/ (- page-width (.getScaledWidth img)) 2)
                               (/ (- page-height (.getScaledHeight img)) 2) )
@@ -110,7 +112,7 @@
   "Generate the cover page"
   (PdfOutline. (.getRootOutline pdf-writer) (PdfDestination. PdfDestination/FITH) "Cover" true)
   (gen-background-image pdf-writer)
-  (gen-image-page document pdf-writer "cover.png"))
+  (gen-image-page document pdf-writer "cover.png" 1.0))
 
 
 (defn make-label-cell [document pdf-writer unit-type]
@@ -208,15 +210,58 @@
         (.setSpacingBefore normal-spacing)
         (.setAlignment Element/ALIGN_LEFT)
         (.add (Chunk. (str "[" (first ndx-link) "] " (second ndx-link)) link-font)) )))
-
-  (.newPage document)
 )
+
+
+(defn- gen-intro-table [document pdf-writer content-ref]
+  "Generate a calendar introduction page"
+  (.add document (doto (Paragraph. "  " normal-font) ; spacer
+                   (.setSpacingBefore (* 2 normal-spacing)) ))
+
+  (let [ title (:title content-ref)
+         rows (:rows content-ref)
+         numcols (apply max (map count rows))
+         table (doto (PdfPTable. numcols)
+                 (.setHorizontalAlignment Element/ALIGN_TOP)
+                 (.setKeepTogether true)
+                 (.setTotalWidth table-width)
+                 (.setLockedWidth true)) ]
+
+    (.setBackgroundColor (.getDefaultCell table) cell-color)
+    (.addCell table (doto (PdfPCell.)       ; add title cell
+                      (.setColspan numcols)
+                      (.setBackgroundColor header-color)
+                      (.setHorizontalAlignment Element/ALIGN_MIDDLE)
+                      (.setPaddingBottom 15)
+                      (.setPaddingTop 15)
+                      (.setUseDescender true)
+                      (.addElement (doto (Paragraph. title title-font)
+                                     (.setAlignment Element/ALIGN_CENTER))) ))
+
+    (doseq [row rows]
+      (doseq [cell row]
+        (.addCell table (doto (PdfPCell.)   ; add data cells
+                          (.setBackgroundColor cell-color)
+                          (.setHorizontalAlignment Element/ALIGN_LEFT)
+                          (.setVerticalAlignment Element/ALIGN_TOP)
+                          (.setPaddingLeft icon-cell-side-padding)
+                          (.setPaddingRight icon-cell-side-padding)
+                          (.setPaddingBottom icon-cell-bottom-padding)
+                          (.setUseDescender true)
+                          (.addElement (Paragraph. cell icon-label-font)) )))
+      (.completeRow table) )
+
+    (.add document table)
+))
 
 
 (defn- gen-preface [document pdf-writer]
   "Generate the preface pages"
   (gen-introduction document pdf-writer content/calintro)
+  (.newPage document)
   (gen-introduction document pdf-writer content/longcnt)
+  (gen-intro-table document pdf-writer (:table content/longcnt))
+  (.newPage document)
   (gen-icon-table document pdf-writer mcal/haab :haab)
   (gen-icon-table document pdf-writer mcal/tzolkin :tzolkin)
 )
