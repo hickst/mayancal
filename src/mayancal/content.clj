@@ -60,8 +60,8 @@
              [ "Uinal" "20 Kin" "20 days" "" ]
              [ "Tun" "18 Uinal" "360 days" "~1 year" ]
              [ "K'atun" "20 Tuns" "7200 days" "~20 (19.7) years" ]
-             [ "B'ak'tun" "20 Katuns" "144,000 days" "~400 (394.5) years" ]
-             [ "Great Cycle" "13 B'ak'tuns" "1,872,000 days" "~5200 (5128.8) years" ]
+             [ "B'ak'tun" "20 Katuns" "144,000 days" "~400 (394.3) years" ]
+             [ "Great Cycle" "13 B'ak'tuns" "1,872,000 days" "~5100 (5125.3) years" ]
       ]}
 })
 
