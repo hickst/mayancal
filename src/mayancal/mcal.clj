@@ -72,7 +72,7 @@
   { :name "pax"    :title "Pax (Great Puma)"           :glyph "pax_glyph.png"    :image "pax.png" }
   { :name "kayab"  :title "K'ayab (Turtle)"            :glyph "kayab_glyph.png"  :image "kayab.png" }
   { :name "kumku"  :title "Kumk'u (Underworld Dragon)" :glyph "kumhu_glyph.png"  :image "kumhu.gif" }
-  { :name "wayeb"  :title "Wayeb (Poisonous)"          :glyph "uayeb_glyph.png"  :image "uayeb.png" } ])
+  { :name "wayeb"  :title "Wayeb (Unlucky)"            :glyph "uayeb_glyph.png"  :image "uayeb.png" } ])
 
 
 ;; solar calendar of 365 days: Haab months crossed with Veintena cycle of 20 days.

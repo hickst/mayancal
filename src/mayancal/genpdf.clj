@@ -49,6 +49,7 @@
 (defonce gregor-color (BaseColor. 0x00 0x7F 0x00))
 (defonce header-color (BaseColor. 0xE9 0xFF 0xDF))
 (defonce link-color (BaseColor. 0x00 0x00 0x7F))
+(defonce link-bg-color (BaseColor. 0xE9 0xFF 0xDF))
 (defonce title-color (BaseColor. 0xE9 0xFF 0xDF))
 (defonce tzday-color (BaseColor. 0x00 0x00 0x7F))
 
@@ -177,8 +178,45 @@
 )
 
 
+(defn- gen-introduction [document pdf-writer content-ref]
+  "Generate a calendar introduction page"
+  (PdfOutline. (.getRootOutline pdf-writer)
+               (PdfDestination. PdfDestination/FITH)
+               (:title content-ref) true)
+  (gen-background-image pdf-writer)
+
+  (.add document                            ; content title
+     (doto (Paragraph.)
+       (.setAlignment Element/ALIGN_CENTER)
+       (.setSpacingAfter normal-spacing)
+       (.add (doto (Chunk. (:title content-ref) month-font)
+               (.setBackground title-color
+                               title-x-padding title-y-padding title-x-padding title-y-padding))) ))
+
+  (doseq [clause (:clauses content-ref)]
+    (.add document                          ; content clauses
+      (doto (Paragraph.)
+        (.setSpacingBefore normal-spacing)
+        (.setAlignment Element/ALIGN_LEFT)
+        (.add (Chunk. clause normal-font)) )))
+
+  (.add document (Paragraph. "  " normal-font)) ; spacer
+
+  (doseq [ndx-link (map vector (iterate inc 1) (:links content-ref))]
+    (.add document                          ; content links
+      (doto (Paragraph.)
+        (.setSpacingBefore normal-spacing)
+        (.setAlignment Element/ALIGN_LEFT)
+        (.add (Chunk. (str "[" (first ndx-link) "] " (second ndx-link)) link-font)) )))
+
+  (.newPage document)
+)
+
+
 (defn- gen-preface [document pdf-writer]
   "Generate the preface pages"
+  (gen-introduction document pdf-writer content/calintro)
+  (gen-introduction document pdf-writer content/longcnt)
   (gen-icon-table document pdf-writer mcal/haab :haab)
   (gen-icon-table document pdf-writer mcal/tzolkin :tzolkin)
 )

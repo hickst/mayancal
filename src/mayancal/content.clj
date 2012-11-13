@@ -23,6 +23,38 @@
 ]})
 
 
+(defonce calintro
+  { :title "The Mayan Calendar "
+    :links [ "http://www.michielb.nl/maya/calendar.html"
+             "http://edj.net/mc2012/fap4.html"
+             "http://en.wikipedia.org/wiki/Maya_calendar"
+             "http://www.tondering.dk/claus/cal/maya.php"
+           ]
+    :clauses [
+      "The Maya developed a sophisticated calendar based on the intersection of various cycles, especially the 260 day Tzolkin (or ritual calendar) and the 365 day Haab (a rough solar calendar also known as the \"cycle of rains\" calendar)."
+
+      "The Tzolkin named each day; like our days of the week. There were 20 day names, each represented by a unique symbol. The days were also numbered from 1 to 13. Since there were 20 day names, after the count of thirteen was reached the next day was numbered 1 again. Since 13 and 20 have no common divisors, this system uniquely represents all 260 (13*20) days of the sacred year with a unique number and day-name combination. So why was the 260 day cycle so important? First, it approximates the 9-month gestation period of human beings, an obviously important period of growth and development. It also corresponds to the interval between Venus emerging as an evening star and its emergence as a morning star (about 258 days), as well as the interval between the planting and harvesting of certain types of crops. [1]"
+
+      "The Haab was a rough solar year of 365 days. The Haab year contained named months called Uinals. These were 18 regular months of 20 days each and one special five-day month called Uayeb. The 5 days of Uayeb were considered unnamed and unlucky and this period was thought to be a dangerous time. Days of the Haab months were numbered 0 to 19. Each day had a number and day name from the 260-day Tzolkin as well as a number for each day of the Haab month. Using the intersections of these cycles, each day can be identified by a four item list: [Tzolkin number, Tzolkin day, Haab number, Haab month]. Counting days cycles through the items, as in the following example: \"One Imix, Zero Pop\", \"Two Ik, One Pop\", \"Three Ak'b'al Two Pop\". The thirteenth day was \"Thirteen B'en, Twelve Pop\" and the next day was \"One Ix, Thirteen Pop\", followed by \"Two Men, Fourteen Pop\". After \"Seven Ajaw, Nineteen Pop\", the next day was \"Eight Imix, Zero Uo\"."
+
+      "Year Bearers: The quality of a year is determined by the day-sign which falls on New Years Day - which is the first day of the Haab. This special day is called the Year Bearer. Since the twenty day-signs divide into the 365-day Haab 18 times with 5 left over, the Year Bearer advances by 5 day-signs every year. Furthermore, five goes into 20 four times; thus there are four possible Year Bearers. They correspond to the four directions and, for the Quiche Maya, the four sacred mountains. In this way, the Calendar's \"windows to the New Year\" are anchored in the directional pillars of the cosmos. [2]  In addition, the four years headed by the Year Bearers are named after them and share their characteristics; therefore, they also have their own prognostications and patron deities. [3]"
+]})
+
+
+(defonce longcnt
+  { :title "The Long Count"
+    :links [ "http://www.michielb.nl/maya/calendar.html"
+             "http://en.wikipedia.org/wiki/Maya_calendar"
+          ]
+    :clauses [
+      "The Maya used special glyphs to indicate various periods of time. The Kin represented one day. A period of 20 days made up a Uinal, a single \"month\" in the Haab cycle. The Tun was a year of 360 days and the K'atun was 20 years of 360 days each. The end of the K'atun was a special time period celebrated by the Maya. The Maya also counted 400 year periods called B'ak'tuns. [1]"
+
+      "All of the aforementioned time periods were used by the Maya in a special day numbering system which is now called the Long Count. Typically, a Long Count date is written as a conjunction of these named periods. For example, the Long Count 9.14.12.2.17 represents 9 B'ak'tuns, 14 K'atuns, 12 Tuns, 2 Uinals and 17 K'ins. [1]  The Long Count calendar identifies a date by counting the number of days from the Mayan creation date 4 Ajaw, 8 Kumk'u (mid 3114 B.C.). Instead of using a base-10 (decimal) scheme like Western numbering, the Long Count days were tallied in a modified base-20 scheme. Thus, 0.0.0.1.5 is equal to 25, and 0.0.0.2.0 is equal to 40. [2]"
+
+      "The current Great Cycle, which began in 3114 B.C. is scheduled to end on December 21st, 2012 A.D. Despite some apocalyptic hype, this is merely the end of the current 13-B'ak'tun cycle and the beginning of the next one."
+]})
+
+
 (defonce license-text
   { :title "Software Licenses"
     :clauses [
