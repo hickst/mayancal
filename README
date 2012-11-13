@@ -1,14 +1,14 @@
 # mayancal
 
-Clojure program to generate a Mayan calendar for a given year.
-
+Clojure program to generate an illustrated Mayan calendar
+(as a PDF file) for the specified year (default 2012).
 
 ## Usage
 
-java -jar mayancal.jar -bn mcal [--year 19xx | 20xx]
+java -jar mayancal.jar -bn outfile-basename [--year 19xx | 20xx]
 
-Example: java -jar mayancal.jar -bn mcal84 --year 1984
-
+Example: java -jar mayancal.jar -bn /tmp/mcal84 --year 1984
+         Generates a Mayan calendar for 1984 into /tmp/mcal84.pdf
 
 ## License
 
