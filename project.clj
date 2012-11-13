@@ -1,4 +1,4 @@
-(defproject mayancal "0.0.43"
+(defproject mayancal "1.0.0"
   :description "Mayan calendar generator"
   :dependencies [ [org.clojure/clojure "1.4.0"]
                   [org.clojure/tools.cli "0.2.2"]
