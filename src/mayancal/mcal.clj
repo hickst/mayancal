@@ -17,8 +17,9 @@
 (ns mayancal.mcal
   (:require [clojure.stacktrace :as st]))
 
-(defn gregorian-date-seq []
+(defn gregorian-date-seq
   "Return an infinite sequence of Gregorian date strings starting on January 1st of 1900"
+  []
   (let [ start-date (java.util.GregorianCalendar. 1900 0 0 0 0)
          gd-format (java.text.SimpleDateFormat. "EEE M/d/yyyy") ]
     (repeatedly
@@ -85,25 +86,29 @@
   (concat (reduce concat [] (repeat 18 (range 20))) (range 5)))
 
 
-(defn days-between-1900-and-year [year]
+(defn days-between-1900-and-year
   "Return the number of days between 1/1/1900 and 1/1/year"
+  [year]
   (let [ start-millis (.getTimeInMillis (java.util.GregorianCalendar. 1900 0 0 0 0))
          end-millis (.getTimeInMillis (java.util.GregorianCalendar. year 0 0 0 0)) ]
     (/ (- end-millis start-millis) 86400000) ; 24 hours * 60 min * 60 sec * 1000 ms
 ))
 
-(defn find-days-in-year [year]
+(defn find-days-in-year
   "Return the number of days in the given year"
+  [year]
   (if (.isLeapYear (java.util.GregorianCalendar.) year) 366 365))
 
+
+;; Transpose a finite sequence of infinite sequences into an infinite sequence of finite sequences"
 (def transpose
-  "Transpose a finite sequence of infinite sequences into an infinite sequence of finite sequences"
   (partial apply map vector))
 
 
 ;; create aligned sequences of Gregorian, Haab, Trecena, and Tzolkin cycles
-(defn make-calround-cycle [options]
+(defn make-calround-cycle
   "Return an infinite lazy sequence of tuples of Gregorian, Haab, Trecena, and Tzolkin day info"
+  [options]
   (let [ days-since-1900 (days-between-1900-and-year (:year options))
          greg-seq (gregorian-date-seq)                      ; starts at 1/1/1900
          haab-cyc (drop 246 (cycle haab-seq))               ; sync cycle to 1/1/1900
@@ -115,8 +120,9 @@
 
 
 ;; main method to create and return the round calendar
-(defn roundcal-year [options]
+(defn roundcal-year
   "Create and return a round calendar sequence for the specified year"
+  [options]
   (let [ days-in-year (find-days-in-year (:year options)) ]
     (partition-by #(:haab %)
                   (map #(apply hash-map

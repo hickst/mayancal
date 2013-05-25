@@ -80,8 +80,9 @@
     (.addCreator "Tom Hicks") ))
 
 
-(defn- gen-background-image [pdf-writer]
+(defn- gen-background-image
   "Generate the background image of textured paper onto the current page"
+  [pdf-writer]
   (let [ page-width (.getHeight PageSize/LETTER)  ;; note reversal of W-H for landscape mode
          page-height (.getWidth PageSize/LETTER)  ;; note reversal of W-H for landscape mode
          under (.getDirectContentUnder pdf-writer)
@@ -93,8 +94,9 @@
     (.restoreState under) ))
 
 
-(defn- gen-image-page [document pdf-writer image-name & extrargs]
+(defn- gen-image-page
   "Generate the picture page for the current month"
+  [document pdf-writer image-name & extrargs]
   (let [ page-width (.getHeight PageSize/LETTER)  ;; note reversal of W-H for landscape mode
          page-height (.getWidth PageSize/LETTER)  ;; note reversal of W-H for landscape mode
          img (Image/getInstance (cjio/resource image-name))
@@ -108,15 +110,17 @@
     (.newPage document) ))
 
 
-(defn- gen-cover [document pdf-writer]
+(defn- gen-cover
   "Generate the cover page"
+  [document pdf-writer]
   (PdfOutline. (.getRootOutline pdf-writer) (PdfDestination. PdfDestination/FITH) "Cover" true)
   (gen-background-image pdf-writer)
   (gen-image-page document pdf-writer "cover.png" 1.0))
 
 
-(defn make-label-cell [document pdf-writer unit-type]
+(defn make-label-cell
   "Create and return the icon table title cell for the given time unit type"
+  [document pdf-writer unit-type]
   (let [ label (:title (unit-type icon-props))
          para (doto (Paragraph. label label-font)
                 (.setAlignment Element/ALIGN_CENTER)) ]
@@ -131,8 +135,9 @@
 ))
 
 
-(defn- make-icon-cell [time-unit unit-type]
+(defn- make-icon-cell
   "Create and return the icon label/image cell using info from the given time-unit"
+  [time-unit unit-type]
   (let [ para (Paragraph. (:title time-unit) icon-label-font)
          glyph-path (str (:path (unit-type icon-props)) (:glyph time-unit))
          icon-cell (PdfPCell.) ]
@@ -156,8 +161,9 @@
 ))
 
 
-(defn gen-icon-table [document pdf-writer icon-data unit-type]
+(defn gen-icon-table
   "Generate a table of day or month icons"
+  [document pdf-writer icon-data unit-type]
   (PdfOutline. (.getRootOutline pdf-writer)
                (PdfDestination. PdfDestination/FITH)
                (:title (unit-type icon-props)) true)
@@ -180,8 +186,9 @@
 )
 
 
-(defn- gen-introduction [document pdf-writer content-ref]
+(defn- gen-introduction
   "Generate a calendar introduction page"
+  [document pdf-writer content-ref]
   (PdfOutline. (.getRootOutline pdf-writer)
                (PdfDestination. PdfDestination/FITH)
                (:title content-ref) true)
@@ -213,8 +220,9 @@
 )
 
 
-(defn- gen-intro-table [document pdf-writer content-ref]
+(defn- gen-intro-table
   "Generate a calendar introduction page"
+  [document pdf-writer content-ref]
   (.add document (doto (Paragraph. "  " normal-font) ; spacer
                    (.setSpacingBefore (* 2 normal-spacing)) ))
 
@@ -255,8 +263,9 @@
 ))
 
 
-(defn- gen-preface [document pdf-writer]
+(defn- gen-preface
   "Generate the preface pages"
+  [document pdf-writer]
   (gen-introduction document pdf-writer content/calintro)
   (.newPage document)
   (gen-introduction document pdf-writer content/longcnt)
@@ -267,8 +276,9 @@
 )
 
 
-(defn- make-month-cell [day]
+(defn- make-month-cell
   "Create and return the month title/image cell using month info from the given day"
+  [day]
   (println "Generating: " (:title (:haab day)))
   (let [ para (doto (Paragraph. (:title (:haab day)) month-font)
                 (.setAlignment Element/ALIGN_RIGHT)
@@ -295,8 +305,9 @@
 ))
 
 
-(defn- make-blank-cell [day-index]
+(defn- make-blank-cell
   "Create and return a new blank cell for the given numbered day"
+  [day-index]
   (let [ para (doto (Paragraph.)
                 (.setAlignment Element/ALIGN_RIGHT)
                 (.setIndentationRight day-cell-margin-right)
@@ -332,8 +343,9 @@
       (.addElement para) )))
 
 
-(defn- gen-months [document pdf-writer roundcal]
+(defn- gen-months
   "Generate the pages for all the months"
+  [document pdf-writer roundcal]
   (doseq [month roundcal]
     (let [ day1 (first month)
            month-name (:name (:haab day1))
@@ -368,8 +380,9 @@
       (.newPage document) )))
 
 
-(defn- gen-postface [document pdf-writer]
+(defn- gen-postface
   "Generate the back page"
+  [document pdf-writer]
   (PdfOutline. (.getRootOutline pdf-writer)
                (PdfDestination. PdfDestination/FITH)
                (:title content/background) true)
@@ -434,8 +447,9 @@
 )
 
 
-(defn gen-cal [roundcal outfile]
+(defn gen-cal
   "Top-level call to generate PDF version of Mayan Calendar"
+  [roundcal outfile]
   (let [ document (Document. (.rotate PageSize/LETTER))
          fos (java.io.FileOutputStream. (str outfile ".pdf"))
          pdf-writer (PdfWriter/getInstance document fos) ]
